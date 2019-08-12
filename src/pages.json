@@ -1,0 +1,58 @@
+{
+	"pages": [
+		{ "path": "pages/index/index", "style": { "navigationBarTitleText": "首页" } },
+		{ "path": "pages/user/index", "style": { "navigationBarTitleText": "我的" } },
+		{ "path": "pages/bluetooth/index", "style": { "navigationBarTitleText": "配网" } }
+	],
+	"subPackages": [
+		{
+			"root": "infor",
+			"pages": [
+				{ "path": "news", "style": { "navigationBarTitleText": "新闻资讯" } },
+				{ "path": "newDetail", "style": { "navigationBarTitleText": "新闻资讯详情" } },
+				{ "path": "help", "style": { "navigationBarTitleText": "帮助中心" } },
+				{ "path": "helpDetail", "style": { "navigationBarTitleText": "帮助中心详情" } }
+			]
+		},
+		{
+			"root": "device",
+			"pages": [
+				{ "path": "devices", "style": { "navigationBarTitleText": "我的设备" } },
+				{ "path": "add", "style": { "navigationBarTitleText": "新增设备" } },
+				{ "path": "deviceDetail", "style": { "navigationBarTitleText": "" } },
+				{ "path": "band", "style": { "navigationBarTitleText": "" } },
+				{ "path": "subscribe", "style": { "navigationBarTitleText": "我的预约" } }
+			]
+		}
+	],
+	"tabBar": {
+		"color": "#b3b3b3",
+		"selectedColor": "#000",
+		"borderStyle": "black",
+		"backgroundColor": "#fff",
+		"list": [
+			{ "pagePath": "pages/index/index", "text": "首页", "iconPath": "/static/image/home@2x.png", "selectedIconPath": "/static/image/home@2x.png" },
+			{ "pagePath": "pages/bluetooth/index", "text": "配网", "iconPath": "/static/image/peiwang@2x.png", "selectedIconPath": "/static/image/peiwang@2x.png" },
+			{ "pagePath": "pages/user/index", "text": "我的", "iconPath": "/static/image/user@2x.png", "selectedIconPath": "/static/image/user@2x.png" }
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "智能热水壶",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#f1f2f8"
+	},
+	"condition": {
+		"current": 0,
+		"list": [
+			{ "name": "我的", "path": "pages/user/index" },
+			{ "name": "绑定手机", "path": "device/band" },
+			{ "name": "我的设备", "path": "device/devices" },
+			{ "name": "新增设备", "path": "device/add" },
+			{ "name": "我的设备详情", "path": "device/deviceDetail" },
+			{ "name": "我的预约", "path": "device/subscribe" },
+			{ "name": "新闻资讯", "path": "infor/news" },
+			{ "name": "新闻资讯详情", "path": "infor/newDetail" }
+		]
+	}
+}
