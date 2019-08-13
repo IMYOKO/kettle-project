@@ -2,7 +2,7 @@
   <view class="devices">
     <ul class="device-list" v-if="deviceItem.length > 0">
       <li v-for="(item, index) in deviceItem" :key='index'>
-        <view class="device-item" @click="$CommonJs.pathTo('/device/deviceList' + item.deviceid)">
+        <view class="device-item" @click="goDeviceInfor(item)">
           <view class="img-box">
             <image :src='item.devicelogo' />
           </view>
@@ -17,31 +17,6 @@
           <view class="name">新增设备</view>
         </view>
       </li>
-      <!-- <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li> -->
-      
     </ul>
     <view class="no-device-list" v-else>
       <view class="add-box" @click="addDevice">
@@ -65,8 +40,11 @@ export default {
     ...mapState(['userid'])
   },
   methods: {
-    addDevice (deviceid) {
-      this.$CommonJs.pathTo('/device/add?deviceid=' + deviceid)
+    goDeviceInfor (item) {
+      this.$CommonJs.pathTo('/device/deviceList?deviceid=' + item.deviceid)
+    },
+    addDevice () {
+      this.$CommonJs.pathTo('/device/add')
     }
   }
 }

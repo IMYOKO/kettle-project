@@ -4,7 +4,7 @@
     <view class="code-wrapper">
       <view class="code-box">
         <view class="code-item">
-          {{kf_img}}
+          <image :src='kf_img' />
         </view>
         <view class="tel">电话：{{kf_mobile}}</view>
       </view>
@@ -52,6 +52,10 @@ export default {
         height: 200px;
         background: gray;
         margin-left: 20px;
+        image {
+          width: 200px;
+          height: 200px;
+        }
       }
       .tel {
         height: 30px;

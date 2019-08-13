@@ -71,10 +71,10 @@ export default {
     this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   computed: {
-    ...mapState(['showCodePop', 'userid', 'setDeviceInfoItems'])
+    ...mapState(['showCodePop', 'userid'])
   },
   methods: {
-    ...mapMutations(['setCodeType']),
+    ...mapMutations(['setCodeType', 'setDeviceInfoItems']),
     async queryDeviceInfo (prams) {
       const data = await this.$server.queryDeviceInfo(prams)
       this.$server.resultCallback(
@@ -91,7 +91,7 @@ export default {
       const payload = {
         deviceid: this.deviceid,
         modelid: item.modelid,
-        peifang: item.deviceid,
+        peifang: item.peifang,
       }
       this.setDeviceInfoItems(payload)
     }

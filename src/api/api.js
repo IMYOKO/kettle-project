@@ -46,6 +46,8 @@ class Api extends BasicApi {
    * @param {Number} deviceid 
    * @param {Number} modelid 
    * @param {String} time  预约时间 2019-10-10 10:10:10 年月日时分秒格式 
+   * @param {Number} shichang 
+   * @param {Number} wendu 
    */
   saveJobTime (data) {
     return this.post('/api/saveJobTime.htm', data, {})

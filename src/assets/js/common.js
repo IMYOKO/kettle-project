@@ -2,7 +2,7 @@ import configData from '../../config/index'
 
 // 路由跳转
 const pathTo = url => {
-  console.log(url)
+  // console.log(url)
   uni.navigateTo({url});
 }
 

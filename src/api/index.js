@@ -29,8 +29,8 @@ class BasicApi {
     } else {
       console.log(data);
       let resultDdata = res.data;
-      console.log("返回数据" + JSON.stringify(resultDdata));
-      if (resultDdata.flag == 0) {
+      // console.log("返回数据" + JSON.stringify(resultDdata));
+      if (res.statusCode === 200 && resultDdata.flag === 0) {
         sucssCallbak && sucssCallbak(resultDdata)
       } else {
         uni.showToast({

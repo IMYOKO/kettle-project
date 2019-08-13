@@ -23,11 +23,16 @@ export default {
     return {
       mobile: '',
       code: '',
+      callBackCode: '',
       hasSend: false,
       codeText: '获取验证码',
       timer: null,
       current: 10
     }
+  },
+  onLoad () {
+    this.isMobile(1)
+    console.log(this.isMobile(1))
   },
   onUnload () {
     if (this.timer) {
@@ -38,17 +43,31 @@ export default {
     ...mapState(['userid'])
   },
   methods: {
+    ...mapMutations(['setMobile']),
+    isMobile (phone) {
+      const reg = /^0?1[3|4|5|7|8][0-9]\d{8}$/
+      return reg.test(phone)
+    },
     async bindMobile () {
+      // uni.navigateBack()
       if (this.mobile == '') {
         this.$CommonJs.showToast('请输入手机号码！')
         return false
       }
-      if (this.mobile == '') {
-        this.$CommonJs.showToast('手机号码错误！')
+      if (!this.isMobile(this.mobile)) {
+        this.$CommonJs.showToast('请输入正确的手机号码！')
         return false
       }
       if (this.code == '') {
         this.$CommonJs.showToast('请输入验证码！')
+        return false
+      }
+      if (this.callBackCode == '') {
+        this.$CommonJs.showToast('请先获取验证码！')
+        return false
+      }
+      if (this.callBackCode !== this.code) {
+        this.$CommonJs.showToast('验证码错误！')
         return false
       }
       const prams = {
@@ -60,7 +79,11 @@ export default {
 			this.$server.resultCallback(
 				data,
 				() => {
-					this.$CommonJs.showToast('绑定成功！')
+          this.setMobile(this.mobile)
+          this.$CommonJs.showToast('绑定成功！')
+          setTimeout(() => {
+            uni.navigateBack()
+          }, 1500)
 				}
 			)
     },
@@ -72,8 +95,8 @@ export default {
         this.$CommonJs.showToast('请输入手机号码！')
         return false
       }
-      if (this.mobile == '') {
-        this.$CommonJs.showToast('手机号码错误！')
+      if (!this.isMobile(this.mobile)) {
+        this.$CommonJs.showToast('请输入正确的手机号码！')
         return false
       }
       const prams = {
@@ -85,7 +108,8 @@ export default {
         const data = await this.$server.getCode(prams)
         this.$server.resultCallback(
           data,
-          () => {
+          (data) => {
+            this.callBackCode = data.code
             this.$CommonJs.showToast('验证码发送成功，请注意查收！')
             let current = 10
             this.timer = setInterval(()=> {

@@ -2,24 +2,24 @@
   <view class="user">
     <!-- 绑定手机信息 start -->
     <view class="phone-wrapper">
-      <view class="button-wrapper">
-        <view class="button" @click="goBand('/device/band')">绑定手机</view>
+      <view class="phone-infor" v-if="mobile">{{mobile}}</view>
+      <view class="button-wrapper" v-else>
+        <view class="button" @click="$CommonJs.pathTo('/device/band')">绑定手机</view>
       </view>
-      <!-- <view class="phone-infor">13049492162</view> -->
     </view>
     <!-- 绑定手机信息 end -->
 
     <!-- 我的设备 start -->
     <ul class="shebei-list">
       <li>
-        <view class="item clearfix" @click="goDevice('/device/devices')">
+        <view class="item clearfix" @click="goPage('/device/devices')">
           <view class="icon icon-01"></view>
           <view class="text">我的设备</view>
           <view class="next"></view>
         </view>
       </li>
       <li>
-        <view class="item clearfix" @click="goSubscribe('/device/subscribe')">
+        <view class="item clearfix" @click="goPage('/device/subscribe')">
           <view class="icon icon-02"></view>
           <view class="text">我的预约</view>
           <view class="next"></view>
@@ -38,16 +38,19 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
+  computed: {
+    ...mapState(['mobile'])
+  },
   methods: {
-    goBand (url) {
+    goPage (url) {
       this.$CommonJs.pathTo(url)
-    },
-    goDevice (url) {
-      this.$CommonJs.pathTo(url)
-    },
-    goSubscribe (url) {
-      this.$CommonJs.pathTo(url)
+      // if (this.mobile) {
+      //   this.$CommonJs.pathTo(url)
+      // } else {
+      //   this.$CommonJs.showToast('请先绑定手机号码！')
+      // }
     }
   }
 }

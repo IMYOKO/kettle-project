@@ -2,18 +2,10 @@
   <view class="news">
     <view class="news-wrapper">
 			<ul class="news-list" v-if="newsItem.length > 0">
-				<li v-for="(item, index) in newsItem" :key="index" @click="goNewsPage">
+				<li v-for="(item, index) in newsItem" :key="index" @click="goNewsPage(item)">
 					<view class="news-title">{{item.title}}</view>
 					<view class="news-time">{{item.addtime}}</view>
 				</li>
-				<!-- <li>
-					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li>
-				<li>
-					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li> -->
 			</ul>
 			<view class="no-mores" v-else>暂无新闻</view>
 		</view>
@@ -27,9 +19,12 @@ export default {
 		return {
 			page: 1,
 			totalpage: 1,
-			rows: 0,
+			rows: 20,
 			newsItem: []
 		}
+	},
+	onShow () {
+		this.queryNewsList()
 	},
   methods: {
 		...mapMutations(['setNewsItems']),

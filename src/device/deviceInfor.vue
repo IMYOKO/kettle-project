@@ -11,26 +11,26 @@
       </view>
       <ul class="time-wrapper">
         <li>
-          <view class="time">保温时长 <text class="span">6小时</text><text class="em">(建议保温时长6小时)</text></view>
-          <slider class="slider-wen" value="6" @change="sliderChange" min="1" max="12" />
+          <view class="time">保温时长 <text class="span">{{shichang}}小时</text><text class="em"></text></view>
+          <slider class="slider-wen" :value="shichang" @change="sliderChangeSC" min="0" max="12" />
           <view class="text">
-            <text>1小时</text>
+            <text>0小时</text>
             <text>12小时</text>
           </view>
         </li>
         <li>
-          <view class="time">保温温度 <text class="span">80℃</text><text class="em">(建议保温温度80℃)</text></view>
-          <slider class="slider-wen" value="80" @change="sliderChange" min="40" max="90" />
+          <view class="time">保温温度 <text class="span">{{wendu}}℃</text><text class="em"></text></view>
+          <slider class="slider-wen" :value="wendu" @change="sliderChangeWD" min="0" max="100" />
           <view class="text">
-            <text>40℃</text>
-            <text>90℃</text>
+            <text>0℃</text>
+            <text>100℃</text>
           </view>
         </li>
       </ul>
       <view class="button">
         <view class="button-wrapper">
           <text @click="showPop = true">预约</text>
-          <text>确定</text>
+          <text @click="saveJobTime(1)">确定</text>
         </view>
       </view>
     </view>
@@ -51,7 +51,7 @@
           </view>
         </view>
         <view class="button-box">
-          <text @click="showPop = false">确定预约</text>
+          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
         </view>
       </view>
       <view class="bg" @click="showPop = false"></view>
@@ -89,7 +89,9 @@ export default {
       }),
       startDate: getDate('start'),
       endDate: getDate('end'),
-      time: '08:00'
+      time: '06:00',
+      shichang: 0,
+      wendu: 0,
     }
   },
   onUnload() {
@@ -104,12 +106,21 @@ export default {
   },
   methods: {
     ...mapMutations(['setDeviceInfoItems']),
-    sliderChange(e) {
-      console.log('value 发生变化：' + e.detail.value)
+    sliderChangeSC(e) {
+      this.shichang = e.detail.value
+      // console.log('value 发生变化：' + e.detail.value)
+    },
+    sliderChangeWD(e) {
+      this.wendu = e.detail.value
+      // console.log('value 发生变化：' + e.detail.value)
     },
     switchChange (e) {
       this.baowen = e.target.value
-      console.log('switch2 发生 change 事件，携带值为', e.target.value)
+      if (!this.baowen) {
+        this.shichang = 0
+        this.wendu = 0
+      }
+      // console.log('switch2 发生 change 事件，携带值为', e.target.value)
     },
     bindDateChange (e) {
       this.date = e.target.value
@@ -121,10 +132,13 @@ export default {
       const prams = {
         type,
         userid: this.userid,
-        deviceid: this.deviceInfoItems.deviceid,
+        deviceid: Number(this.deviceInfoItems.deviceid),
         modelid: this.deviceInfoItems.modelid,
-        time: this.date + ' ' + this.time + ':00'
+        time: type === 0 ? this.date + ' ' + this.time + ':00' : '',
+        shichang: this.shichang,
+        wendu: this.wendu
       }
+      console.log(prams)
       const data =  await this.$server.saveJobTime(prams)
       this.$server.resultCallback(
 				data,
@@ -185,11 +199,6 @@ export default {
         .em {
           font-size: 12px;
         }
-      }
-
-      .slider-wen {
-        margin-left: 0;
-        margin-right: 0;
       }
 
       .text {

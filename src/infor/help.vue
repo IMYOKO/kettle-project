@@ -2,18 +2,9 @@
   <view class="news">
     <view class="news-wrapper">
 			<ul class="news-list" v-if="helpItem.length > 0">
-				<li v-for="(item, index) in helpItem" :key="index">
+				<li v-for="(item, index) in helpItem" :key="index" @click="goHelpDetailPage(item)">
 					<view class="news-title">{{item.title}}</view>
-					<!-- <view class="news-time">2019-08-01 12:24:23</view> -->
 				</li>
-				<!-- <li>
-					<view class="news-title">帮助中心 标题帮助中心标题帮助中心标题帮助中心标题帮助中心标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li>
-				<li>
-					<view class="news-title">帮助中心标题帮助中心标题帮助中心标题帮助中心标题帮助中心标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li> -->
 			</ul>
 			<view class="no-mores" v-else>暂无更多</view>
 		</view>
@@ -21,19 +12,28 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 export default {
 	data() {
 		return {
 			helpItem: []
 		}
 	},
+	onShow () {
+		this.queryHelpList()
+	},
 	methods: {
+		...mapMutations(['setHelpItems']),
 		async queryHelpList () {
 			const data = await this.$server.queryHelpList()
 			this.$server.resultCallback(data,
 			(data) => {
         this.helpItem = data.helpItem
 			})
+		},
+		goHelpDetailPage (item) {
+			this.$CommonJs.pathTo('/infor/helpDetail')
+      this.setHelpItems(item)
 		}
 	}
   
@@ -63,7 +63,8 @@ export default {
 					color: #333;
 					font-size: 16px;
 					line-height: 24px;
-					margin-bottom: 10px;
+					padding: 5px 0;
+					// margin-bottom: 10px;
           word-break: break-all;
           font-weight: bold;
           overflow: hidden;

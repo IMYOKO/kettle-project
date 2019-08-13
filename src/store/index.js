@@ -32,6 +32,10 @@ const mutations = {
   setCodeType (state, value) {
     state.showCodePop = value
   },
+  setMobile (state, mobile) {
+    state.mobile = mobile
+    uni.setStorageSync('mobile', mobile)
+  },
   setUserInfor (state, payload) {
     state.userid = payload.userid
     state.username = payload.username
@@ -39,15 +43,16 @@ const mutations = {
     state.logo_path = payload.logo_path
     state.mobile = payload.mobile
     state.openid = payload.openid
-    uni.setStorageSync('userid', payload.userid);
-    uni.setStorageSync('username', payload.username);
-    uni.setStorageSync('nickname', payload.nickname);
-    uni.setStorageSync('logo_path', payload.logo_path);
-    uni.setStorageSync('mobile', payload.mobile);
-    uni.setStorageSync('openid', payload.openid);
+    uni.setStorageSync('userid', payload.userid)
+    uni.setStorageSync('username', payload.username)
+    uni.setStorageSync('nickname', payload.nickname)
+    uni.setStorageSync('logo_path', payload.logo_path)
+    uni.setStorageSync('mobile', payload.mobile)
+    uni.setStorageSync('openid', payload.openid)
   },
   setDeviceInfoItems (state, payload) {
     state.deviceInfoItems = Object.assign({}, payload)
+    console.log(state.deviceInfoItems)
   },
   setHelpItems (state, payload) {
     state.helpItems = Object.assign({}, payload)

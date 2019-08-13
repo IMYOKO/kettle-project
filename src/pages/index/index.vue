@@ -1,6 +1,6 @@
 <template>
 	<view class="home">
-		<view class="banner-wrapper">
+		<view class="banner-wrapper" v-if="bannerItem.length > 0">
 			<swiper class="swiper"
 				:indicator-dots="indicatorDots"
 				:indicator-color="'#000'"
@@ -9,27 +9,17 @@
 				:interval="interval"
 				:duration="duration"
 			>
-				<swiper-item class="swiper-item" v-for="(item, index) in bannerItem" :key='index'>
+				<swiper-item class="swiper-item" v-for="(item, index) in bannerItem" :key='index' @click="goWebView(item.img_url)">
 					<image :src="item.img_path" class="image" />
 				</swiper-item>
-				<!-- <swiper-item class="swiper-item">
-					<image src="../../static/image/bm_banner_02@2x.png" class="image" />
-				</swiper-item>
-				<swiper-item class="swiper-item">
-					<image src="../../static/image/bm_banner_03@2x.png" class="image" />
-				</swiper-item> -->
-				
-				<!-- <swiper-item class="swiper-item" v-for="(item, index) in bannerList" :key="index">
-					<image @click="golinkurl(item.linkUrl)" class="image" :src="item.imageUrl" width="100%" alt=""/>
-				</swiper-item> -->
 			</swiper>
 		</view>
 
-		<button
+		<!-- <button
 			v-if="isdevelopment"
 			open-type="getUserInfo"
 			@getuserinfo="getuserinfo"
-		>获取信息</button>
+		>获取信息</button> -->
 
 		<view class="shebei-wrapper">
 			<view class="title">我的设备</view>
@@ -45,17 +35,9 @@
 			</view>
 			<ul class="news-list" v-if="newsItem.length > 0">
 				<li v-for="(item, index) in newsItem" :key="index">
-					<view class="news-title" @click="$CommonJs.pathTo('/infor/newDetail?newsid=' + item.newsid)">{{item.title}}</view>
+					<view class="news-title" @click="goNewsPage(item)">{{item.title}}</view>
 					<view class="news-time">{{item.addtime}}</view>
 				</li>
-				<!-- <li>
-					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li>
-				<li>
-					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
-				</li> -->
 			</ul>
 			<view class="no-mores" v-else>暂无更多</view>
 		</view>
@@ -83,32 +65,31 @@ export default {
 		if (process.env.NODE_ENV === 'development') {
 			this.isdevelopment = true
 		}
-		// console.log(process.env.NODE_ENV === 'development')
 		this.wexinlogin()
 	},
 	computed: {
 		...mapState(['openid'])
 	},
 	methods: {
-		...mapMutations(['setUserInfor']),
+		...mapMutations(['setUserInfor', 'setNewsItems']),
 		getuserinfo(e) {
 			console.log(e)
 		},
+		goWebView (url) {
+			this.$CommonJs.pathTo('/infor/webView?url=' + url)
+		},
+		goNewsPage (item) {
+			this.$CommonJs.pathTo('/infor/newDetail?newsid=' + item.newsid)
+      this.setNewsItems(item)
+		},
 		wexinlogin () {
-			const _this = this
-			console.log(this.openid)
-			// console.log(!uni.getStorageSync('openid'))
-			if (!this.openid) {
-				uni.login({
-					provider: 'weixin',
-					success: (loginRes) => {
-						console.log(loginRes)
-						this.weixinCode = loginRes.code
-						console.log(_this.weixinCode)
-						this.login(loginRes.code)
-					}
-				})
-			}
+			uni.login({
+				provider: 'weixin',
+				success: (loginRes) => {
+					this.weixinCode = loginRes.code
+					this.login(loginRes.code)
+				}
+			})
 		},
 		async login (code) {
 			const data = await this.$server.login({code})
