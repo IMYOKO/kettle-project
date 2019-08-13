@@ -20,16 +20,26 @@ class BasicApi {
     var [error, res] = data;
     if (error) {
       console.log(error)
-      // var title = "请求超时";
-      // uni.showToast({
-      //   title,
-      //   icon: 'none',
-      //   duration: 2000
-      // });
+      uni.showToast({
+        title: '请求失败',
+        icon: 'none',
+        duration: 2000
+      });
+      errorCallbak && errorCallbak();
     } else {
       console.log(data);
-      var resultDdata = res.data;
+      let resultDdata = res.data;
       console.log("返回数据" + JSON.stringify(resultDdata));
+      if (resultDdata.flag == 0) {
+        sucssCallbak && sucssCallbak(resultDdata)
+      } else {
+        uni.showToast({
+          title: resultDdata.errmsg,
+          icon: 'none',
+          duration: 2000
+        });
+        errorCallbak && errorCallbak(resultDdata);
+      }
       // if (resultDdata.status == 0) {
       //   sucssCallbak && sucssCallbak(resultDdata.status, resultDdata.data, res.header);
       // } else {

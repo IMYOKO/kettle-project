@@ -1,18 +1,32 @@
 <template>
   <view class="news-detail">
     <view class="news-title">
-      这里是新闻标题这里是新闻标题这里是新闻标题这里是闻标题这里是新闻标题这里是新闻标题
+      {{newsItems.title}}
     </view>
-    <view class="news-time">2019-08-01 12:24:23</view>
+    <view class="news-time">{{newsItems.addtime}}</view>
     <view class="news-content">
-      这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容这里是新闻内容
+      {{newsItems.content}}
     </view>
   </view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
-  
+  onUnload() {
+    this.setNewsItems({
+      newsid: null,
+      title: '',
+      content: '',
+      addtime: '',
+    })
+  },
+  computed: {
+    ...mapState(['newsItems'])
+  },
+  methods: {
+    ...mapMutations(['setNewsItems']),
+  }
 }
 </script>
 

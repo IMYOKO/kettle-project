@@ -2,8 +2,8 @@
 let BasicUrl = ''
 if (process.env.NODE_ENV === 'development') {
   BasicUrl = 'http://localhost:8000'
-}else {
-    BasicUrl = 'https://ark.huitaojuzg.com/'
+} else {
+  BasicUrl = ''
 }
 
 export default {

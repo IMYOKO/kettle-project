@@ -16,32 +16,34 @@ const showToast = title => {
 }
 
 const getUserInfor = () => {
-  console.log(uni.getStorageSync('openid'))
+  console.log(!uni.getStorageSync('openid'))
   if (!uni.getStorageSync('openid')) {
     // sessionStorageSync.setItem("openid",uuida());
     uni.login({
       provider: 'weixin',
       success(loginRes) {
+        console.log(loginRes)
         const url = configData.BasicUrl + "/app/activity/getH5Openid?code=" + loginRes.code;
-        uni.request({
-          method: 'GET',
-          url: url,
-          data: {},
-          success(res) {
-            console.log("返回了登录信息");
-            console.log(res);
-            if (res.statusCode === 200) {
-              uni.setStorageSync('openid', JSON.parse(res.data.data.result).openid);
-            }
-          }
-        });
+        // uni.request({
+        //   method: 'GET',
+        //   url: url,
+        //   data: {},
+        //   success(res) {
+        //     console.log("返回了登录信息");
+        //     console.log(res);
+        //     if (res.statusCode === 200) {
+        //       uni.setStorageSync('openid', JSON.parse(res.data.data.result).openid);
+        //     }
+        //   }
+        // });
         // 获取用户信息
-        uni.getUserInfo({
-          provider: 'weixin',
-          success(infoRes) {
-            uni.setStorageSync('userInfo', infoRes.userInfo)
-          }
-        });
+        // uni.getUserInfo({
+        //   provider: 'weixin',
+        //   success(infoRes) {
+        //     console.log(infoRes)
+        //     uni.setStorageSync('userInfo', infoRes.userInfo)
+        //   }
+        // });
       }
     });
   }

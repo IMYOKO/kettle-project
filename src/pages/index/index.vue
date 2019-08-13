@@ -9,26 +9,33 @@
 				:interval="interval"
 				:duration="duration"
 			>
-				<swiper-item class="swiper-item">
-					<image src="../../static/image/bm_banner_01@2x.png" class="image" />
+				<swiper-item class="swiper-item" v-for="(item, index) in bannerItem" :key='index'>
+					<image :src="item.img_path" class="image" />
 				</swiper-item>
-				<swiper-item class="swiper-item">
+				<!-- <swiper-item class="swiper-item">
 					<image src="../../static/image/bm_banner_02@2x.png" class="image" />
 				</swiper-item>
 				<swiper-item class="swiper-item">
 					<image src="../../static/image/bm_banner_03@2x.png" class="image" />
-				</swiper-item>
+				</swiper-item> -->
+				
 				<!-- <swiper-item class="swiper-item" v-for="(item, index) in bannerList" :key="index">
 					<image @click="golinkurl(item.linkUrl)" class="image" :src="item.imageUrl" width="100%" alt=""/>
 				</swiper-item> -->
 			</swiper>
 		</view>
 
+		<button
+			v-if="isdevelopment"
+			open-type="getUserInfo"
+			@getuserinfo="getuserinfo"
+		>获取信息</button>
+
 		<view class="shebei-wrapper">
 			<view class="title">我的设备</view>
 			<!-- 未绑定 -->
 			<view class="my-shebei" style="margin-top: 10px">
-				<DeviceList />
+				<DeviceList :deviceItem='deviceItem' />
 			</view>
 		</view>
 
@@ -36,40 +43,85 @@
 			<view class="title">新闻资讯
 				<view class="more" @click="$CommonJs.pathTo('/infor/news')">更多>></view>
 			</view>
-			<ul class="news-list">
-				<li>
-					<view class="news-title" @click="$CommonJs.pathTo('/infor/newDetail?id=1')">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
+			<ul class="news-list" v-if="newsItem.length > 0">
+				<li v-for="(item, index) in newsItem" :key="index">
+					<view class="news-title" @click="$CommonJs.pathTo('/infor/newDetail?newsid=' + item.newsid)">{{item.title}}</view>
+					<view class="news-time">{{item.addtime}}</view>
 				</li>
-				<li>
+				<!-- <li>
 					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
 					<view class="news-time">2019-08-01 12:24:23</view>
 				</li>
 				<li>
 					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
 					<view class="news-time">2019-08-01 12:24:23</view>
-				</li>
+				</li> -->
 			</ul>
+			<view class="no-mores" v-else>暂无更多</view>
 		</view>
 	</view>
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
 import DeviceList from '../../component/deviceList'
 export default {
 	data() {
 		return {
+			weixinCode: '',
+			isdevelopment: false,
 			indicatorDots: true,
 			autoplay: true,
 			interval: 3000,
 			duration: 500,
-			bannerList: []
+			deviceItem: [],
+			bannerItem: [],
+			newsItem: []
 		}
 	},
 	onShow() {
-		// this.$CommonJs.getUserInfor()
+		if (process.env.NODE_ENV === 'development') {
+			this.isdevelopment = true
+		}
+		// console.log(process.env.NODE_ENV === 'development')
+		this.wexinlogin()
+	},
+	computed: {
+		...mapState(['openid'])
 	},
 	methods: {
+		...mapMutations(['setUserInfor']),
+		getuserinfo(e) {
+			console.log(e)
+		},
+		wexinlogin () {
+			const _this = this
+			console.log(this.openid)
+			// console.log(!uni.getStorageSync('openid'))
+			if (!this.openid) {
+				uni.login({
+					provider: 'weixin',
+					success: (loginRes) => {
+						console.log(loginRes)
+						this.weixinCode = loginRes.code
+						console.log(_this.weixinCode)
+						this.login(loginRes.code)
+					}
+				})
+			}
+		},
+		async login (code) {
+			const data = await this.$server.login({code})
+			this.$server.resultCallback(
+				data,
+				(data) => {
+					this.deviceItem = data.deviceItem
+					this.bannerItem = data.bannerItem
+					this.newsItem = data.newsItem
+					this.setUserInfor(data)
+				}
+			)
+		}
 	},
 	components: {
 		DeviceList
@@ -78,6 +130,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.no-mores {
+	height: 50px;
+	line-height: 50px;
+	font-size: 14px;
+	color: #999;
+	text-align: center;
+}
 .home {
 	padding: 15px 15px 20px;
 

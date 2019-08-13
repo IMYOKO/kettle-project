@@ -3,25 +3,108 @@
     <h2 class="title">绑定手机</h2>
     <ul class="from">
       <li>
-        <input type="text" v-model="phone" placeholder="请输入手机号码">
+        <input type="text" v-model="mobile" placeholder="请输入手机号码">
       </li>
       <li>
         <input type="text" class="code" v-model="code" placeholder="请输入验证码">
-        <view class="get-code">获取验证码</view>
+        <view class="get-code" @click="getCode">{{codeText}}</view>
       </li>
     </ul>
     <view class="button-wrapper">
-     <view class="button">确定</view>
+      <view class="button" @click="bindMobile">确定</view>
     </view>
   </view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
   data () {
     return {
-      phone: '',
-      code: ''
+      mobile: '',
+      code: '',
+      hasSend: false,
+      codeText: '获取验证码',
+      timer: null,
+      current: 10
+    }
+  },
+  onUnload () {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  },
+  computed: {
+    ...mapState(['userid'])
+  },
+  methods: {
+    async bindMobile () {
+      if (this.mobile == '') {
+        this.$CommonJs.showToast('请输入手机号码！')
+        return false
+      }
+      if (this.mobile == '') {
+        this.$CommonJs.showToast('手机号码错误！')
+        return false
+      }
+      if (this.code == '') {
+        this.$CommonJs.showToast('请输入验证码！')
+        return false
+      }
+      const prams = {
+        userid: this.userid,
+        mobile: this.mobile,
+        code: this.code
+      }
+      const data = await this.$server.bindMobile(prams)
+			this.$server.resultCallback(
+				data,
+				() => {
+					this.$CommonJs.showToast('绑定成功！')
+				}
+			)
+    },
+    async getCode () {
+      if (this.hasSend) {
+        return false
+      }
+      if (this.mobile == '') {
+        this.$CommonJs.showToast('请输入手机号码！')
+        return false
+      }
+      if (this.mobile == '') {
+        this.$CommonJs.showToast('手机号码错误！')
+        return false
+      }
+      const prams = {
+        userid: this.userid,
+        mobile: this.mobile
+      }
+      try {
+        this.hasSend = true
+        const data = await this.$server.getCode(prams)
+        this.$server.resultCallback(
+          data,
+          () => {
+            this.$CommonJs.showToast('验证码发送成功，请注意查收！')
+            let current = 10
+            this.timer = setInterval(()=> {
+              current --;
+              this.codeText = current + 'S'
+              if (current <= 0) {
+                clearInterval(this.timer)
+                this.codeText = '获取验证码'
+                this.hasSend = false
+              }
+            }, 1000)
+          },
+          () => {
+            this.hasSend = false
+          }
+        )
+      } catch (error) {
+        
+      }
     }
   }
 }

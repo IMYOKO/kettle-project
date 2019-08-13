@@ -1,23 +1,34 @@
 <template>
   <view class="device">
-    <DeviceList />
+    <DeviceList :deviceItem='deviceItem' />
   </view>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import DeviceList from '../component/deviceList'
 export default {
-  mounted() {
-    // this.getBanner()
+  data() {
+    return {
+      deviceItem: []
+    }
+  },
+  onShow() {
+    this.queryDevice()
+  },
+  computed: {
+    ...mapState(['userid'])
   },
   methods: {
-    // async getBanner() {
-    //   const data = await this.$server.getBanner()
-    //   this.$server.resultCallback(
-    //     data,
-    //     () => {}
-    //   )
-    // }
+    async queryDevice() {
+      const data = await this.$server.queryDevice({userid: this.userid})
+      this.$server.resultCallback(
+        data,
+        (data) => {
+          this.deviceItem = data.deviceItem
+        }
+      )
+    }
   },
   components: {
     DeviceList

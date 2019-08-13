@@ -2,34 +2,49 @@
   <view class="add-device">
     <ul class="from">
       <li>
-        <input type="text" class="code" v-model="code" placeholder="请输入设备码">
+        <input type="text" class="code" v-model="mac" placeholder="请输入设备码">
         <view class="get-code" @click="getScanCode">扫码获取</view>
       </li>
     </ul>
     <view class="button-wrapper">
-     <view class="button">确定</view>
+     <view class="button" @click="sumbit">确定</view>
     </view>
   </view>
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
 export default {
   data () {
     return {
-      code: ''
+      mac: ''
     }
+  },
+  computed: {
+    ...mapState(['userid'])
   },
   methods: {
     getScanCode () {
       const _this = this
       uni.scanCode({
         onlyFromCamera: true,
-        success: function (res) {
+        success: (res) => {
           // console.log('条码类型：' + res.scanType);
           // console.log('条码内容：' + res.result);
-          _this.code = res.result
+          this.mac = res.result
         }
       });
+    },
+    async sumbit () {
+      if (this.mac == '') {
+        this.$CommonJs.showToast('请输入设备码！')
+        return false
+      }
+      const data = await this.$server.addDevice({userid: this.userid, mac: this.mac})
+      this.$server.resultCallback(data,
+			(data) => {
+        this.$CommonJs.showToast('添加成功！')
+			})
     }
   }
 }

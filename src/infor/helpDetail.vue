@@ -1,18 +1,30 @@
 <template>
   <view class="news-detail">
     <view class="news-title">
-      帮助中心标题帮助中心标题帮助中心标题帮助中心标题帮助中心标题
+      {{helpItems.title}}
     </view>
-    <view class="news-time">2019-08-01 12:24:23</view>
+    <!-- <view class="news-time">2019-08-01 12:24:23</view> -->
     <view class="news-content">
-      帮助中心内容帮助中心内容帮助中心内容帮助中心内容
+      {{helpItems.content}}
     </view>
   </view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
-  
+  onUnload() {
+    this.setHelpItems({
+      title: '',
+      content: '',
+    })
+  },
+  computed: {
+    ...mapState(['helpItems'])
+  },
+  methods: {
+    ...mapMutations(['setHelpItems']),
+  }
 }
 </script>
 

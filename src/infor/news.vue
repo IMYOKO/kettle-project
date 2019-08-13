@@ -1,31 +1,63 @@
 <template>
   <view class="news">
     <view class="news-wrapper">
-			<ul class="news-list">
-				<li>
-					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
-					<view class="news-time">2019-08-01 12:24:23</view>
+			<ul class="news-list" v-if="newsItem.length > 0">
+				<li v-for="(item, index) in newsItem" :key="index" @click="goNewsPage">
+					<view class="news-title">{{item.title}}</view>
+					<view class="news-time">{{item.addtime}}</view>
 				</li>
-				<li>
+				<!-- <li>
 					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
 					<view class="news-time">2019-08-01 12:24:23</view>
 				</li>
 				<li>
 					<view class="news-title">这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题这里是新闻标题</view>
 					<view class="news-time">2019-08-01 12:24:23</view>
-				</li>
+				</li> -->
 			</ul>
+			<view class="no-mores" v-else>暂无新闻</view>
 		</view>
   </view>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
-  
+	data () {
+		return {
+			page: 1,
+			totalpage: 1,
+			rows: 0,
+			newsItem: []
+		}
+	},
+  methods: {
+		...mapMutations(['setNewsItems']),
+		async queryNewsList () {
+			const data = await this.$server.queryNewsList({page: this.page})
+			this.$server.resultCallback(data,
+			(data) => {
+        this.newsItem = data.newsItem
+        this.totalpage = data.totalpage
+        this.rows = data.rows
+			})
+		},
+		goNewsPage (item) {
+			this.$CommonJs.pathTo('/infor/newDetail?newsid=' + item.newsid)
+      this.setNewsItems(item)
+		}
+	}
 }
 </script>
 
 <style lang="less" scoped>
+.no-mores {
+	height: 50px;
+	line-height: 50px;
+	font-size: 14px;
+	color: #999;
+	text-align: center;
+}
 .news {
   height: 100%;
   background: #fafafa;

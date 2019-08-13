@@ -4,9 +4,9 @@
     <view class="code-wrapper">
       <view class="code-box">
         <view class="code-item">
-
+          {{kf_img}}
         </view>
-        <view class="tel">电话：13032213634</view>
+        <view class="tel">电话：{{kf_mobile}}</view>
       </view>
     </view>
   </view>
@@ -15,6 +15,10 @@
 <script>
 import { mapMutations } from 'vuex'
 export default {
+  props: {
+    kf_mobile: String,
+    kf_img: String
+  },
   methods: {
     ...mapMutations(['setCodeType'])
   }

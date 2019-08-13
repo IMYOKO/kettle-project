@@ -2,7 +2,17 @@
   <view class="device-detail">
 
     <ul class="device-list">
-      <li>
+      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)">
+        <view class="device-item">
+          <view class="item">
+            <view class="img-box">
+              <image :src='item.modellogo' />
+            </view>
+            <view class="name">{{item.modelname}}</view>
+          </view>
+        </view>
+      </li>
+      <!-- <li>
         <view class="device-item">
           <view class="item">
             <view class="img-box">
@@ -11,71 +21,11 @@
             <view class="name">水壶一</view>
           </view>
         </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li>
+      </li> -->
     </ul>
 
-    <view class="more-device">更多模式</view>
-    <ul class="shebei-list">
+    <!-- <view class="more-device">更多模式</view> -->
+    <!-- <ul class="shebei-list">
       <li>
         <view class="item clearfix">
           <view class="icon icon-01"></view>
@@ -97,10 +47,10 @@
           <view class="next"></view>
         </view>
       </li>
-    </ul>
+    </ul> -->
 
     <view class="contact" @click="setCodeType(true)"></view>
-    <Code v-if="showCodePop" />
+    <Code v-if="showCodePop" :kf_img='kf_img' :kf_mobile='kf_mobile' />
   </view>
 </template>
 
@@ -109,13 +59,42 @@ import { mapState, mapMutations } from 'vuex'
 import Code from '../component/code'
 export default {
   data () {
-    return {}
+    return {
+      deviceInfoItem: [],
+      kf_mobile: '',
+      kf_img: '',
+      deviceid: null
+    }
+  },
+  onLoad(option) {
+    this.deviceid = option.deviceid
+    this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   computed: {
-    ...mapState(['showCodePop'])
+    ...mapState(['showCodePop', 'userid', 'setDeviceInfoItems'])
   },
   methods: {
-    ...mapMutations(['setCodeType'])
+    ...mapMutations(['setCodeType']),
+    async queryDeviceInfo (prams) {
+      const data = await this.$server.queryDeviceInfo(prams)
+      this.$server.resultCallback(
+				data,
+				(data) => {
+					this.deviceInfoItem = data.deviceInfoItem
+					this.kf_img = data.kf_img
+					this.kf_mobile = data.kf_mobile
+				}
+			)
+    },
+    goDevicePage (item) {
+      this.$CommonJs.pathTo('/device/deviceInfor?modelid' + item.modelid)
+      const payload = {
+        deviceid: this.deviceid,
+        modelid: item.modelid,
+        peifang: item.deviceid,
+      }
+      this.setDeviceInfoItems(payload)
+    }
   },
   components: {
     Code

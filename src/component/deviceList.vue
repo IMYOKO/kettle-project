@@ -1,36 +1,12 @@
 <template>
   <view class="devices">
-    <ul class="device-list" v-if="deviceList.length > 0">
-      <li>
-        <view class="device-item" @click="$CommonJs.pathTo('/device/deviceDetail')">
+    <ul class="device-list" v-if="deviceItem.length > 0">
+      <li v-for="(item, index) in deviceItem" :key='index'>
+        <view class="device-item" @click="$CommonJs.pathTo('/device/deviceList' + item.deviceid)">
           <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
+            <image :src='item.devicelogo' />
           </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
-        </view>
-      </li>
-      <li>
-        <view class="device-item">
-          <view class="img-box">
-            <image src='../static/image/shuihu_01@2x.png' />
-          </view>
-          <view class="name">水壶一</view>
+          <view class="name">{{item.devicename}}</view>
         </view>
       </li>
       <li>
@@ -41,6 +17,31 @@
           <view class="name">新增设备</view>
         </view>
       </li>
+      <!-- <li>
+        <view class="device-item">
+          <view class="img-box">
+            <image src='../static/image/shuihu_01@2x.png' />
+          </view>
+          <view class="name">水壶一</view>
+        </view>
+      </li>
+      <li>
+        <view class="device-item">
+          <view class="img-box">
+            <image src='../static/image/shuihu_01@2x.png' />
+          </view>
+          <view class="name">水壶一</view>
+        </view>
+      </li>
+      <li>
+        <view class="device-item">
+          <view class="img-box">
+            <image src='../static/image/shuihu_01@2x.png' />
+          </view>
+          <view class="name">水壶一</view>
+        </view>
+      </li> -->
+      
     </ul>
     <view class="no-device-list" v-else>
       <view class="add-box" @click="addDevice">
@@ -52,29 +53,20 @@
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
 export default {
-  data () {
-    return {
-      deviceList: [
-        {
-          name: 'sdsadsa'
-        }
-      ]
-    }
+  props: {
+    deviceItem: Array
   },
-  mounted() {
-    // this.getBanner()
+  data () {
+    return {}
+  },
+  computed: {
+    ...mapState(['userid'])
   },
   methods: {
-    addDevice () {
-      this.$CommonJs.pathTo('/device/add')
-    },
-    async getBanner() {
-      const data = await this.$server.getBanner()
-      this.$server.resultCallback(
-        data,
-        () => {}
-      )
+    addDevice (deviceid) {
+      this.$CommonJs.pathTo('/device/add?deviceid=' + deviceid)
     }
   }
 }
