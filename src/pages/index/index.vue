@@ -36,6 +36,7 @@
 			<ul class="news-list" v-if="newsItem.length > 0">
 				<li v-for="(item, index) in newsItem" :key="index">
 					<view class="news-title" @click="goNewsPage(item)">{{item.title}}</view>
+					<view class="news-jianshu">{{item.jianshu}}</view>
 					<view class="news-time">{{item.addtime}}</view>
 				</li>
 			</ul>
@@ -179,11 +180,22 @@ export default {
 					color: #666;
 					font-size: 16px;
 					line-height: 24px;
-					margin-bottom: 10px;
+					margin-bottom: 5px;
 					word-break: break-all;
 					font-weight: bold;
 					text-overflow: ellipsis;
 					overflow: hidden;
+					display: -webkit-box;
+					-webkit-line-clamp: 2;
+					-webkit-box-orient: vertical;
+				}
+				.news-jianshu {
+					font-size: 15px;
+					color: #666;
+					line-height: 23px;
+					margin-bottom: 10px;
+					overflow: hidden;
+          text-overflow: ellipsis;
 					display: -webkit-box;
 					-webkit-line-clamp: 2;
 					-webkit-box-orient: vertical;

@@ -4,6 +4,7 @@
 			<ul class="news-list" v-if="newsItem.length > 0">
 				<li v-for="(item, index) in newsItem" :key="index" @click="goNewsPage(item)">
 					<view class="news-title">{{item.title}}</view>
+					<view class="news-jianshu">{{item.jianshu}}</view>
 					<view class="news-time">{{item.addtime}}</view>
 				</li>
 			</ul>
@@ -18,7 +19,7 @@ export default {
 	data () {
 		return {
 			page: 1,
-			totalpage: 1,
+			totalpage: 0,
 			rows: 20,
 			newsItem: []
 		}
@@ -34,7 +35,6 @@ export default {
 			(data) => {
         this.newsItem = data.newsItem
         this.totalpage = data.totalpage
-        this.rows = data.rows
 			})
 		},
 		goNewsPage (item) {
@@ -68,10 +68,21 @@ export default {
 					color: #333;
 					font-size: 16px;
 					line-height: 24px;
-					margin-bottom: 10px;
+					margin-bottom: 5px;
           word-break: break-all;
           font-weight: bold;
           overflow: hidden;
+          text-overflow: ellipsis;
+					display: -webkit-box;
+					-webkit-line-clamp: 2;
+					-webkit-box-orient: vertical;
+				}
+				.news-jianshu {
+					font-size: 15px;
+					color: #666;
+					line-height: 23px;
+					margin-bottom: 10px;
+					overflow: hidden;
           text-overflow: ellipsis;
 					display: -webkit-box;
 					-webkit-line-clamp: 2;
