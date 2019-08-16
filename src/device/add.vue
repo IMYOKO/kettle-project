@@ -57,14 +57,14 @@ export default {
 
 <style lang="less" scoped>
 .add-device {
-  padding: 15px 20px;
+  padding: 20px 20px;
 
   .button-wrapper {
     padding-top: 30%;
     display: flex;
     justify-content: center;
     .button {
-      width: 60%;
+      width: 80%;
       height: 44px;
       line-height: 44px;
       color: #fff;
@@ -87,7 +87,7 @@ export default {
         left: 0;
         bottom: 0px;
         width: 100%;
-        padding: 6px 0;
+        padding: 8px 0;
         font-size: 16px;
         color: #333;
 
@@ -101,7 +101,7 @@ export default {
         right: 0;
         bottom: 0;
         z-index: 10;
-        width: 34px;
+        width: 30px;
         height: 40px;
         line-height: 40px;
         font-size: 16px;
@@ -110,9 +110,9 @@ export default {
         line-height: 40px;
         text-align: center;
         image {
-          margin-top: 3px;
-          width: 34px;
-          height: 34px;
+          margin-top: 5px;
+          width: 30px;
+          height: 30px;
         }
       }
     }
