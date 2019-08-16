@@ -4,7 +4,7 @@
       <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
     </view>
     <ul class="device-list">
-      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-if='index <= 5'>
+      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index <= 5'>
         <view class="device-item">
           <view class="item">
             <view class="img-box">
@@ -18,7 +18,7 @@
 
     <view class="more-device" v-if='deviceInfoItem.length > 6'>更多模式</view>
     <ul class="shebei-list">
-      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-if='index > 5'>
+      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index > 5'>
         <view class="item clearfix">
           <view class="icon">
             <image :src='item.modellogo' />
@@ -64,7 +64,7 @@ export default {
       deviceInfoItem: [],
       kf_mobile: '',
       kf_img: '',
-      have_newota: 1,
+      have_newota: 0,
       ota_name: '',
       ota_version: '',
       ota_time: '',
@@ -73,6 +73,9 @@ export default {
   },
   onLoad(option) {
     this.deviceid = option.deviceid
+    uni.setNavigationBarTitle({
+    　title: option.title
+    })
     this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   computed: {
@@ -96,7 +99,7 @@ export default {
 			)
     },
     goDevicePage (item) {
-      this.$CommonJs.pathTo('/device/deviceInfor?modelid' + item.modelid)
+      this.$CommonJs.pathTo('/device/deviceInfor?modelid' + item.modelid + '&title=' + item.modelname)
       const payload = {
         deviceid: this.deviceid,
         modelid: item.modelid,
@@ -142,7 +145,9 @@ export default {
     background-size: contain;
 
     &.ota {
-      bottom: 80px;
+      background: url('../static/image/gujian.png') center center no-repeat;
+      background-size: contain;
+      bottom: 74px;
     }
   }
 

@@ -94,7 +94,12 @@ export default {
       wendu: 0,
     }
   },
-  onUnload() {
+  onLoad (option) {
+    uni.setNavigationBarTitle({
+    　title: option.title
+    })
+  },
+  onUnload () {
     this.setDeviceInfoItems({
       modelid: null,
       peifang: '',

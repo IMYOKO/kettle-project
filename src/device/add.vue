@@ -3,7 +3,9 @@
     <ul class="from">
       <li>
         <input type="text" class="code" v-model="mac" placeholder="请输入设备码">
-        <view class="get-code" @click="getScanCode">扫码获取</view>
+        <view class="get-code" @click="getScanCode">
+          <image src='../static/image/scan.png' />
+        </view>
       </li>
     </ul>
     <view class="button-wrapper">
@@ -99,13 +101,19 @@ export default {
         right: 0;
         bottom: 0;
         z-index: 10;
-        width: 35%;
+        width: 34px;
         height: 40px;
+        line-height: 40px;
         font-size: 16px;
         font-weight: bold;
         color: #f9b073;
         line-height: 40px;
         text-align: center;
+        image {
+          margin-top: 3px;
+          width: 34px;
+          height: 34px;
+        }
       }
     }
   }

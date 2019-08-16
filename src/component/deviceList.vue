@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     goDeviceInfor (item) {
-      this.$CommonJs.pathTo('/device/deviceList?deviceid=' + item.deviceid)
+      this.$CommonJs.pathTo('/device/deviceList?deviceid=' + item.deviceid + '&title=' + item.devicename)
     },
     addDevice () {
       this.$CommonJs.pathTo('/device/add')
