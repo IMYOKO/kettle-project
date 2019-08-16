@@ -94,6 +94,15 @@ class Api extends BasicApi {
   queryHelpList () {
     return this.post('/api/queryHelpList.htm', {}, {})
   }
+  
+  /**
+   * 固件升级
+   * @param {Number} userid
+   * @param {Number} deviceid
+   */
+  upOta (data) {
+    return this.post('/api/upOta.htm', data, {})
+  }
 
 }
 

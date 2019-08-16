@@ -1,11 +1,18 @@
 <template>
   <view class="user">
     <!-- 绑定手机信息 start -->
-    <view class="phone-wrapper">
+    <!-- <view class="phone-wrapper">
       <view class="phone-infor" v-if="mobile">{{mobile}}</view>
       <view class="button-wrapper" v-else>
         <view class="button" @click="$CommonJs.pathTo('/device/band')">绑定手机</view>
       </view>
+    </view> -->
+    <view class="phone-wrapper u-logo">
+      <view class='user-logo'>
+        <image src='../../static/image/userlogo.png' />
+      </view>
+      <view class="phone" v-if="mobile">{{mobile}}</view>
+      <view class="band-phone" v-else><text @click="$CommonJs.pathTo('/device/band')">点击绑定手机</text></view>
     </view>
     <!-- 绑定手机信息 end -->
 
@@ -86,6 +93,33 @@ export default {
       font-weight: bold;
       color: #000;
       text-align: center;
+    }
+
+    &.u-logo {
+      padding: 20px;
+      height: 64px;
+      .user-logo {
+        width: 64px;
+        height: 64px;
+        float: left;
+        image {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .phone {
+        font-size: 20px;
+        padding-left: 84px;
+        line-height: 64px;
+      }
+      .band-phone {
+        margin-left: 84px;
+        line-height: 64px;
+        border-radius: 10px;
+        font-size: 16px;
+        text-decoration: underline;
+      }
     }
   }
 

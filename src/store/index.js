@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
+  showOtaPop: false,
   showCodePop: false,
   userid: uni.getStorageSync('userid') || '', // 用户id
   username: uni.getStorageSync('username') || '', // 用户账号
@@ -11,6 +12,7 @@ const state = {
   logo_path: uni.getStorageSync('logo_path') || '', // 头像
   mobile: uni.getStorageSync('mobile') || '', // 手机
   openid: uni.getStorageSync('openid') || '', // 用户openid
+  wifi_qrcode: uni.getStorageSync('wifi_qrcode') || '', // wifi_qrcode
   deviceInfoItems: {
     modelid: null,
     peifang: '',
@@ -32,6 +34,9 @@ const mutations = {
   setCodeType (state, value) {
     state.showCodePop = value
   },
+  setOtaType (state, value) {
+    state.showOtaPop = value
+  },
   setMobile (state, mobile) {
     state.mobile = mobile
     uni.setStorageSync('mobile', mobile)
@@ -43,12 +48,14 @@ const mutations = {
     state.logo_path = payload.logo_path
     state.mobile = payload.mobile
     state.openid = payload.openid
+    state.wifi_qrcode = payload.wifi_qrcode
     uni.setStorageSync('userid', payload.userid)
     uni.setStorageSync('username', payload.username)
     uni.setStorageSync('nickname', payload.nickname)
     uni.setStorageSync('logo_path', payload.logo_path)
     uni.setStorageSync('mobile', payload.mobile)
     uni.setStorageSync('openid', payload.openid)
+    uni.setStorageSync('wifi_qrcode', payload.wifi_qrcode)
   },
   setDeviceInfoItems (state, payload) {
     state.deviceInfoItems = Object.assign({}, payload)

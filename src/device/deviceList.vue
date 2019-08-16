@@ -1,8 +1,10 @@
 <template>
   <view class="device-detail">
-
+    <view class="ad-wrapper">
+      <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
+    </view>
     <ul class="device-list">
-      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)">
+      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-if='index <= 5'>
         <view class="device-item">
           <view class="item">
             <view class="img-box">
@@ -12,28 +14,20 @@
           </view>
         </view>
       </li>
-      <!-- <li>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
-              <image src='../static/image/shuihu_01@2x.png' />
-            </view>
-            <view class="name">水壶一</view>
-          </view>
-        </view>
-      </li> -->
     </ul>
 
-    <!-- <view class="more-device">更多模式</view> -->
-    <!-- <ul class="shebei-list">
-      <li>
+    <view class="more-device" v-if='deviceInfoItem.length > 6'>更多模式</view>
+    <ul class="shebei-list">
+      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-if='index > 5'>
         <view class="item clearfix">
-          <view class="icon icon-01"></view>
-          <view class="text">功能1</view>
+          <view class="icon">
+            <image :src='item.modellogo' />
+          </view>
+          <view class="text">{{item.modelname}}</view>
           <view class="next"></view>
         </view>
       </li>
-      <li>
+      <!-- <li>
         <view class="item clearfix">
           <view class="icon icon-02"></view>
           <view class="text">功能1</view>
@@ -46,23 +40,34 @@
           <view class="text">功能1</view>
           <view class="next"></view>
         </view>
-      </li>
-    </ul> -->
+      </li> -->
+    </ul>
 
+    <!-- 客服 -->
     <view class="contact" @click="setCodeType(true)"></view>
+    <!-- 固件 -->
+    <view class="contact ota" v-if="have_newota === 1" @click="setOtaType(true)"></view>
+
+
     <Code v-if="showCodePop" :kf_img='kf_img' :kf_mobile='kf_mobile' />
+    <Ota v-if="showOtaPop" :ota_name='ota_name' :ota_version='ota_version' :deviceid='deviceid' :ota_time='ota_time' :upOtaCallback='upOtaCallback' />
   </view>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
 import Code from '../component/code'
+import Ota from '../component/ota'
 export default {
   data () {
     return {
       deviceInfoItem: [],
       kf_mobile: '',
       kf_img: '',
+      have_newota: 1,
+      ota_name: '',
+      ota_version: '',
+      ota_time: '',
       deviceid: null
     }
   },
@@ -71,10 +76,10 @@ export default {
     this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   computed: {
-    ...mapState(['showCodePop', 'userid'])
+    ...mapState(['showCodePop', 'showOtaPop', 'userid'])
   },
   methods: {
-    ...mapMutations(['setCodeType', 'setDeviceInfoItems']),
+    ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems']),
     async queryDeviceInfo (prams) {
       const data = await this.$server.queryDeviceInfo(prams)
       this.$server.resultCallback(
@@ -83,6 +88,10 @@ export default {
 					this.deviceInfoItem = data.deviceInfoItem
 					this.kf_img = data.kf_img
 					this.kf_mobile = data.kf_mobile
+					this.have_newota = data.have_newota
+					this.ota_name = data.ota_name
+					this.ota_version = data.ota_version
+					this.ota_time = data.ota_time
 				}
 			)
     },
@@ -94,17 +103,33 @@ export default {
         peifang: item.peifang,
       }
       this.setDeviceInfoItems(payload)
+    },
+    upOtaCallback () {
+      this.setOtaType(false)
+      this.have_newota = 0
     }
   },
   components: {
-    Code
+    Code,
+    Ota
   }
 }
 </script>
 
 <style lang="less" scoped>
 .device-detail {
-  padding: 15px 20upx;
+  padding: 10px 20upx;
+
+  .ad-wrapper {
+    height: 240upx;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 0 5px 10px;
+    image {
+      width: 100%;
+      height: 100%;
+    }
+  }
 
   .contact {
     width: 44px;
@@ -115,6 +140,10 @@ export default {
     z-index: 100;
     background: url('../static/image/help@2x.png') center center no-repeat;
     background-size: contain;
+
+    &.ota {
+      bottom: 80px;
+    }
   }
 
   .device-list {
@@ -191,6 +220,7 @@ export default {
   }
 
   .shebei-list {
+    padding-bottom: 50px;
     border-top: 1px solid #ddd;
     li {
       border-bottom: 1px solid #ddd;
@@ -203,18 +233,23 @@ export default {
           width: 44px;
           height: 44px;
           margin-top: 12px;
-          &-01 {
-            background: url('../static/image/shebei@2x.png') center center no-repeat;
-            background-size: contain;
+          image {
+            display: block;
+            width: 44px;
+            height: 44px;
           }
-          &-02 {
-            background: url('../static/image/yuyue@2x.png') center center no-repeat;
-            background-size: contain;
-          }
-          &-03 {
-            background: url('../static/image/help@2x.png') center center no-repeat;
-            background-size: contain;
-          }
+          // &-01 {
+          //   background: url('../static/image/shebei@2x.png') center center no-repeat;
+          //   background-size: contain;
+          // }
+          // &-02 {
+          //   background: url('../static/image/yuyue@2x.png') center center no-repeat;
+          //   background-size: contain;
+          // }
+          // &-03 {
+          //   background: url('../static/image/help@2x.png') center center no-repeat;
+          //   background-size: contain;
+          // }
         }
         .text {
           font-size: 18px;

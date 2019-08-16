@@ -44,6 +44,9 @@ export default {
       this.$server.resultCallback(data,
 			(data) => {
         this.$CommonJs.showToast('添加成功！')
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 500)
 			})
     }
   }
