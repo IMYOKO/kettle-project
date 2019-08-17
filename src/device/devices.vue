@@ -43,7 +43,7 @@ export default {
 .device {
   padding: 10px 10px;
   .ad-wrapper {
-    height: 240upx;
+    height: 350upx;
     border-radius: 20px;
     overflow: hidden;
     margin: 0 5px 10px;

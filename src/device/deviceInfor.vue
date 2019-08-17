@@ -1,5 +1,8 @@
 <template>
   <view class="devices-infor">
+    <view class="ad-wrapper">
+      <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
+    </view>
     <view class="caipu-title">查看菜谱</view>
     <view class="caipu-content">
       {{deviceInfoItems.peifang}}
@@ -160,6 +163,17 @@ export default {
 .devices-infor {
   padding: 15px;
 
+  .ad-wrapper {
+    height: 350upx;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 0 0 15px 0;
+    image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
   .caipu-title {
     font-size: 16px;
     line-height: 24px;
@@ -215,7 +229,7 @@ export default {
       }
     }
     .button {
-      margin-top: 60px;
+      margin-top: 20px;
       display: flex;
       justify-content: center;
       &-wrapper {

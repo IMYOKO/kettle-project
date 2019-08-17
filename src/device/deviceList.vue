@@ -1,8 +1,5 @@
 <template>
   <view class="device-detail">
-    <view class="ad-wrapper">
-      <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
-    </view>
     <ul class="device-list">
       <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index <= 5'>
         <view class="device-item">
@@ -123,17 +120,6 @@ export default {
 .device-detail {
   padding: 10px 20upx;
 
-  .ad-wrapper {
-    height: 240upx;
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 0 5px 10px;
-    image {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
   .contact {
     width: 44px;
     height: 44px;
@@ -191,7 +177,7 @@ export default {
         margin: 0 5px 10px;
         border-radius: 20px;
         padding: 0 5px;
-        height: 345upx;
+        height: 300upx;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -200,7 +186,7 @@ export default {
           text-align: center;
           image {
             display: inline-block;
-            width: 50px;
+            width: 60px;
             height: 60px;
           }
         }

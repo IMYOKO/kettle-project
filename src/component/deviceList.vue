@@ -102,7 +102,7 @@ export default {
           text-align: center;
           image {
             display: inline-block;
-            width: 50px;
+            width: 60px;
             height: 60px;
           }
         }
