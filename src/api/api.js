@@ -104,6 +104,37 @@ class Api extends BasicApi {
     return this.post('/api/upOta.htm', data, {})
   }
 
+  /**
+   * 设备编辑
+   * @param {Number} userid
+   * @param {Number} deviceid
+   * @param {Number} type  1、修改设备名称  2、删除设备  3、分享设备”
+   * @param {String} devicename 设备名称  type为1时必填
+   * @param {String} mobile 用户手机号, type为3时必填
+   */
+  updateDevice (data) {
+    return this.post('/api/updateDevice.htm', data, {})
+  }
+
+  /**
+   * 查询设备下子用户
+   * @param {Number} userid
+   * @param {Number} deviceid
+   */
+  queryDeviceUser (data) {
+    return this.post('/api/queryDeviceUser.htm', data, {})
+  }
+
+  /**
+   * 删除设备子用户
+   * @param {Number} userid
+   * @param {Number} deviceid
+   * @param {Number} deluserid 被删除的用户id
+   */
+  delDeviceUser (data) {
+    return this.post('/api/delDeviceUser.htm', data, {})
+  }
+
 }
 
 export default new Api()

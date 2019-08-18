@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
+  shareType: false,
   showOtaPop: false,
   showCodePop: false,
   userid: uni.getStorageSync('userid') || '', // 用户id
@@ -15,8 +16,10 @@ const state = {
   wifi_qrcode: uni.getStorageSync('wifi_qrcode') || '', // wifi_qrcode
   deviceInfoItems: {
     modelid: null,
+    deviceid: null,
     peifang: '',
-    deviceid: null
+    img_path: '',
+    status: null
   },
   helpItems: {
     title: '',
@@ -31,6 +34,9 @@ const state = {
 }
 
 const mutations = {
+  setShareType (state, value) {
+    state.shareType = value
+  },
   setCodeType (state, value) {
     state.showCodePop = value
   },
@@ -58,7 +64,7 @@ const mutations = {
     uni.setStorageSync('wifi_qrcode', payload.wifi_qrcode)
   },
   setDeviceInfoItems (state, payload) {
-    state.deviceInfoItems = Object.assign({}, payload)
+    state.deviceInfoItems = Object.assign({}, state.deviceInfoItems, payload)
     console.log(state.deviceInfoItems)
   },
   setHelpItems (state, payload) {

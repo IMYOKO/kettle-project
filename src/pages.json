@@ -20,7 +20,7 @@
 			"pages": [
 				{ "path": "devices", "style": { "navigationBarTitleText": "我的设备" } },
 				{ "path": "add", "style": { "navigationBarTitleText": "新增设备" } },
-				{ "path": "deviceList", "style": { "navigationBarTitleText": "" } },
+				{ "path": "deviceItem", "style": { "navigationBarTitleText": "" } },
 				{ "path": "deviceInfor", "style": { "navigationBarTitleText": "" } },
 				{ "path": "band", "style": { "navigationBarTitleText": "" } },
 				{ "path": "subscribe", "style": { "navigationBarTitleText": "我的预约" } }
@@ -51,7 +51,7 @@
 			{ "name": "绑定手机", "path": "device/band" },
 			{ "name": "我的设备", "path": "device/devices" },
 			{ "name": "新增设备", "path": "device/add" },
-			{ "name": "我的设备列表", "path": "device/deviceList" },
+			{ "name": "我的设备列表", "path": "device/deviceItem" },
 			{ "name": "我的设备详情", "path": "device/deviceInfor" },
 			{ "name": "我的预约", "path": "device/subscribe" },
 			{ "name": "新闻资讯", "path": "infor/news" },

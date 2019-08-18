@@ -58,6 +58,7 @@ import Ota from '../component/ota'
 export default {
   data () {
     return {
+      status: null,
       deviceInfoItem: [],
       kf_mobile: '',
       kf_img: '',
@@ -70,13 +71,14 @@ export default {
   },
   onLoad(option) {
     this.deviceid = option.deviceid
+    this.status = option.status
     uni.setNavigationBarTitle({
     　title: option.title
     })
     this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   computed: {
-    ...mapState(['showCodePop', 'showOtaPop', 'userid'])
+    ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems'])
   },
   methods: {
     ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems']),
@@ -91,16 +93,18 @@ export default {
 					this.have_newota = data.have_newota
 					this.ota_name = data.ota_name
 					this.ota_version = data.ota_version
-					this.ota_time = data.ota_time
+          this.ota_time = data.ota_time
 				}
 			)
     },
     goDevicePage (item) {
-      this.$CommonJs.pathTo('/device/deviceInfor?modelid' + item.modelid + '&title=' + item.modelname)
+      this.$CommonJs.pathTo('/device/deviceInfor?modelid=' + item.modelid + '&title=' + item.modelname)
       const payload = {
         deviceid: this.deviceid,
         modelid: item.modelid,
         peifang: item.peifang,
+        img_path: item.img_path,
+        status: deviceInfoItems.status === null ? this.status : deviceInfoItems.status
       }
       this.setDeviceInfoItems(payload)
     },

@@ -1,7 +1,7 @@
 <template>
   <view class="device">
-    <view class="ad-wrapper">
-      <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
+    <view class="ad-wrapper" v-if="img_url">
+      <image :src="img_url" />
     </view>
     <DeviceList :deviceItem='deviceItem' />
   </view>
@@ -13,6 +13,7 @@ import DeviceList from '../component/deviceList'
 export default {
   data() {
     return {
+      img_path: '',
       deviceItem: []
     }
   },
@@ -29,6 +30,7 @@ export default {
         data,
         (data) => {
           this.deviceItem = data.deviceItem
+          this.img_path = data.img_path
         }
       )
     }

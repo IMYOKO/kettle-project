@@ -1,7 +1,7 @@
 <template>
   <view class="devices-infor">
-    <view class="ad-wrapper">
-      <image src="http://zb.haopengit.com/fileUpload/20190814/07a96d16-672d-4bf6-b1b7-82a50fd964df.jpg" />
+    <view class="ad-wrapper" v-if="deviceInfoItems.img_path">
+      <image :src="deviceInfoItems.img_path" />
     </view>
     <view class="caipu-title">查看菜谱</view>
     <view class="caipu-content">
@@ -30,15 +30,40 @@
           </view>
         </li>
       </ul>
-      <view class="button">
+      <view class="button" v-if="showButton">
         <view class="button-wrapper">
           <text @click="showPop = true">预约</text>
           <text @click="saveJobTime(1)">确定</text>
         </view>
       </view>
+      <view class="button" v-else>
+        <view class="button-wrapper">
+          <text>设备工作中...</text>
+        </view>
+      </view>
     </view>
-    <!-- 预约弹窗 -->
+
+    <!-- 预约弹窗 新版 -->
     <view class="yuyue-pop" v-if='showPop'>
+      <view class="time-select">
+        <h2>选择预约时间</h2>
+        <view class="times">
+          <view class="date-cel">
+            <picker @change="bindPickerChange" :value="timeIndex" :range="timeArray">
+              <view class="uni-input">{{timeArray[timeIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="button-box">
+          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
+        </view>
+      </view>
+      <view class="bg" @click="showPop = false"></view>
+    </view>
+    <!-- 预约弹窗 新版 -->
+
+    <!-- 预约弹窗 旧版 -->
+    <view class="yuyue-pop" v-if='false'>
       <view class="time-select">
         <h2>选择时间</h2>
         <view class="times">
@@ -59,7 +84,7 @@
       </view>
       <view class="bg" @click="showPop = false"></view>
     </view>
-    <!-- 预约弹窗 -->
+    <!-- 预约弹窗 旧版 -->
   </view>
 </template>
 
@@ -85,6 +110,7 @@ function getDate(type) {
 export default {
   data () {
     return {
+      showButton: true,
       showPop: false,
       baowen: true,
       date: getDate({
@@ -95,9 +121,15 @@ export default {
       time: '06:00',
       shichang: 0,
       wendu: 0,
+      timeArray: ['10分钟', '20分钟', '30分钟', '40分钟', '50分钟', '60分钟', '70分钟', '80分钟', '90分钟', '100分钟', '110分钟', '120分钟'],
+      timeIndex: 0,
     }
   },
   onLoad (option) {
+    this.status = option.status
+    if (this.deviceInfoItems.status === '1') {
+      this.showButton = false
+    }
     uni.setNavigationBarTitle({
     　title: option.title
     })
@@ -105,8 +137,10 @@ export default {
   onUnload () {
     this.setDeviceInfoItems({
       modelid: null,
+      deviceid: null,
       peifang: '',
-      deviceid: null
+      img_path: '',
+      status: null
     })
   },
   computed: {
@@ -114,6 +148,10 @@ export default {
   },
   methods: {
     ...mapMutations(['setDeviceInfoItems']),
+    bindPickerChange: function(e) {
+      console.log('picker发送选择改变，携带值为：' + e.target.value)
+      this.timeIndex = e.target.value
+    },
     sliderChangeSC(e) {
       this.shichang = e.detail.value
       // console.log('value 发生变化：' + e.detail.value)
@@ -137,21 +175,31 @@ export default {
       this.time = e.target.value
     },
     async saveJobTime (type) {
-      const prams = {
+      let prams = {
         type,
         userid: this.userid,
         deviceid: Number(this.deviceInfoItems.deviceid),
         modelid: this.deviceInfoItems.modelid,
-        time: type === 0 ? this.date + ' ' + this.time + ':00' : '',
+        // time: type === 0 ? this.date + ' ' + this.time + ':00' : '',
         shichang: this.shichang,
         wendu: this.wendu
       }
-      console.log(prams)
+      if (type === 0) {
+        const yuyuetime = Number.parseInt(this.timeArray[this.timeIndex])
+        const timestamp = Number.parseInt(new Date().getTime()) + 60 * 1000 * yuyuetime
+        prams.time = this.$CommonJs.timestampToTime(timestamp)
+        console.log(yuyuetime)
+      } else {
+        prams.time = ''
+      }
+      // console.log(prams)
+      // return false
       const data =  await this.$server.saveJobTime(prams)
       this.$server.resultCallback(
 				data,
 				(data) => {
           this.$CommonJs.showToast('操作成功！')
+          this.setDeviceInfoItems({ status: '1' })
 				}
 			)
     }
@@ -244,9 +292,9 @@ export default {
           flex: 1;
           text-align: center;
           font-size: 15px;
-          border-right: 1px solid #7993b7;
-          &:nth-of-type(2) {
-            border-right: none;
+          border-left: 1px solid #7993b7;
+          &:nth-of-type(1) {
+            border-left: none;
           }
         }
       }

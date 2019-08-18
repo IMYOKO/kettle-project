@@ -30,10 +30,6 @@ export default {
       current: 10
     }
   },
-  onLoad () {
-    this.isMobile(1)
-    console.log(this.isMobile(1))
-  },
   onUnload () {
     if (this.timer) {
       clearInterval(this.timer)
