@@ -16,6 +16,15 @@ class BasicApi {
       header: {...config}
     })
   }
+  postWifi (url, data, config) {
+    console.log(configData.WifiUrl + url)
+    return uni.request({
+      method: 'POST',
+      url: configData.WifiUrl + url,
+      data,
+      header: {...config}
+    })
+  }
   resultCallback (data, sucssCallbak, errorCallbak) {
     var [error, res] = data;
     if (error) {

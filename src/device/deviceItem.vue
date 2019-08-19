@@ -104,7 +104,7 @@ export default {
         modelid: item.modelid,
         peifang: item.peifang,
         img_path: item.img_path,
-        status: deviceInfoItems.status === null ? this.status : deviceInfoItems.status
+        status: this.deviceInfoItems.status === null ? this.status : this.deviceInfoItems.status
       }
       this.setDeviceInfoItems(payload)
     },

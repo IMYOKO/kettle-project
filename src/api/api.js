@@ -135,6 +135,15 @@ class Api extends BasicApi {
     return this.post('/api/delDeviceUser.htm', data, {})
   }
 
+  /**
+   * wifi配网
+   * @param {String} Ssid
+   * @param {String} WpaPsk
+   */
+  wifiConnect (Ssid, WpaPsk) {
+    return this.postWifi(`/?CMD=CMD1&Ssid=${Ssid}&WpaPsk=${WpaPsk}`, {}, { Authorization: `Basic YWRtaW46YWRtaW4=` })
+  }
+
 }
 
 export default new Api()

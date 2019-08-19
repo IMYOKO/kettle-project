@@ -1,6 +1,6 @@
 <template>
   <view class="bluetooth">
-    <!-- <view class="wifi-wrapper">
+    <view class="wifi-wrapper">
       <image src="../../static/image/WeChat.jpg" />
     </view>
     <view class="content">
@@ -23,14 +23,14 @@
       <view class="wifi-button sure">
         <view class="button" @click="connectWifi">确定</view>
       </view>
-    </view> -->
+    </view>
 
-    <view class="wifi-wrapper qrcode">
+    <!-- <view class="wifi-wrapper qrcode">
       <cover-image v-if="wifi_qrcode" @click="previewImage(wifi_qrcode)" :src='wifi_qrcode'></cover-image>
     </view>
     <view class="content">
       <h2> 扫一扫关注公众号，然后进行配网</h2>
-    </view>
+    </view> -->
     <!-- <view class="tips">
       <h3>操作步骤：</h3>
       <p>方法一： 1. 点击保存二维码到相册；2. 微信扫描图片二维码；3. 关注公众号进行配网</p>
@@ -56,7 +56,7 @@ export default {
     uni.getNetworkType({
       success: (res) => {
         this.networkType = res.networkType
-        console.log(res.networkType);
+        console.log('网络类型： ', res.networkType);
       }
     });
   },
@@ -73,19 +73,15 @@ export default {
         //#ifdef MP-WEIXIN
         wx.startWifi({
           success: (res) => {
-            console.log(res)
             wx.getConnectedWifi({
               success: (WifiInfo) => {
-                console.log(WifiInfo)
+                // console.log(WifiInfo)
                 this.wifiSSID = WifiInfo.wifi.SSID
                 this.BSSID = WifiInfo.wifi.BSSID
                 this.showConnect = true
               },
               fail: () => {
                 this.$CommonJs.showToast('检测连接Wi-Fi失败！')
-              },
-              complete: (res) => {
-                console.log(res)
               }
             })
           }
@@ -105,20 +101,51 @@ export default {
           BSSID: this.BSSID,
           password: this.password,
           success: (res) => {
-            this.$CommonJs.showToast('连接成功！')
+            this.$CommonJs.showToast('连接wifi成功！')
             this.showConnect = false
             this.connected = true
             console.log(res.errMsg)
+            this.connectShebei()
           },
           fail: () => {
-            this.$CommonJs.showToast('连接失败！')
-          },
-          complete: (res) => {
-            console.log(res)
+            this.$CommonJs.showToast('连接wifi失败！')
           }
         })
         //#endif
       }
+    },
+    // 连接设备
+    connectShebei () {
+      //#ifdef MP-WEIXIN
+      wx.connectWifi({
+        SSID: this.$ConfigData.Ssid,
+        password: this.$ConfigData.WpaPsk,
+        success: (res) => {
+          this.$CommonJs.showToast('连接CMD成功！')
+          // this.showConnect = false
+          // this.connected = true
+          this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
+          console.log(res.errMsg)
+        },
+        fail: (err) => {
+          console.log(err)
+          this.$CommonJs.showToast('连接CMD失败！')
+        }
+      })
+      //#endif
+    },
+    // wifi配网
+    async wifiConnect (Ssid, WpaPsk) {
+      console.log('wifi接口参数: ', Ssid, WpaPsk)
+      const data = await this.$server.wifiConnect(Ssid, WpaPsk)
+      console.log(data)
+      this.$server.resultCallback(
+        data,
+        (data) => {
+          this.$CommonJs.showToast('请求CMD成功！')
+          console.log(data)
+        }
+      )
     },
     previewImage (url) {
       uni.previewImage({

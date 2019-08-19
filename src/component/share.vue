@@ -122,11 +122,11 @@ export default {
         deviceid: this.deviceItemItem.deviceid
       }
       if (type === 1) {
-        if (this.devicename == '') {
+        if (this.deviceName == '') {
           this.$CommonJs.showToast('设备名称不能为空！')
           return false
         }
-        prams.devicename = this.devicename
+        prams.devicename = this.deviceName
       }
       if (type === 3) {
         if (this.mobile == '') {
@@ -140,6 +140,7 @@ export default {
         prams.mobile = this.mobile
       }
       console.log(prams)
+      // return false
       const data =  await this.$server.updateDevice(prams)
       this.$server.resultCallback(
 				data,

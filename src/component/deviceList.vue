@@ -65,14 +65,14 @@ export default {
       this.$CommonJs.pathTo('/device/add')
     },
     showFx (item) {
-      this.setShareType(true)
+      // this.setShareType(true)
+      // this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
+      if (item.is_zhu === '1') {
+        this.setShareType(true)
         this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
-      // if (item.is_zhu === '1') {
-      //   this.setShareType(true)
-      //   this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
-      // } else {
-      //   this.$CommonJs.showToast('无权限操作！')
-      // }
+      } else {
+        this.$CommonJs.showToast('无权限操作！')
+      }
     }
   },
   components: {
