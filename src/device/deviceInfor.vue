@@ -32,7 +32,7 @@
       </ul>
       <view class="button" v-if="showButton">
         <view class="button-wrapper">
-          <text @click="showPop = true">预约</text>
+          <text @click="yuyueFn">预约</text>
           <text @click="saveJobTime(1)">确定</text>
         </view>
       </view>
@@ -44,7 +44,7 @@
     </view>
 
     <!-- 预约弹窗 新版 -->
-    <view class="yuyue-pop" v-if='showPop'>
+    <!-- <view class="yuyue-pop" v-if='showPop'>
       <view class="time-select">
         <h2>选择预约时间</h2>
         <view class="times">
@@ -59,11 +59,11 @@
         </view>
       </view>
       <view class="bg" @click="showPop = false"></view>
-    </view>
+    </view> -->
     <!-- 预约弹窗 新版 -->
 
     <!-- 预约弹窗 旧版 -->
-    <view class="yuyue-pop" v-if='false'>
+    <!-- <view class="yuyue-pop" v-if='false'>
       <view class="time-select">
         <h2>选择时间</h2>
         <view class="times">
@@ -75,6 +75,38 @@
           <view class="date-cel">
             <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
               <view class="uni-input">{{time}}:00</view>
+            </picker>
+          </view>
+        </view>
+        <view class="button-box">
+          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
+        </view>
+      </view>
+      <view class="bg" @click="showPop = false"></view>
+    </view> -->
+    <!-- 预约弹窗 旧版 -->
+
+    <!-- 预约弹窗 第三版 -->
+    <view class="yuyue-pop" v-if='showPop'>
+      <view class="time-select">
+        <h2>选择时间</h2>
+        <view class="times">
+          <view class="date-cel">
+            <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
+              <view class="uni-input">{{date}}</view>
+            </picker>
+          </view>
+          <!-- <view class="date-cel">
+            <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
+              <view class="uni-input">{{time}}:00</view>
+            </picker>
+          </view> -->
+          <view class="date-cel">
+            <!-- <picker mode="multiSelector" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
+              <view class="uni-input">{{time}}:00</view>
+            </picker> -->
+            <picker mode="multiSelector" @columnchange="bindMultiPickerColumnChange" :value="multiIndex" :range="multiArray">
+              <view class="uni-input">{{multiArray[0][multiIndex[0]]}}:{{multiArray[1][multiIndex[1]]}}:00</view>
             </picker>
           </view>
         </view>
@@ -96,17 +128,32 @@ function getDate(type) {
   let year = date.getFullYear();
   let month = date.getMonth() + 1;
   let day = date.getDate();
+  // let hour = date.getHours();
+  // let minute = Number.parseInt(date.getMinutes() / 10);
+  // console.log(hour, minute)
 
   if (type === 'start') {
     year = year - 60;
   } else if (type === 'end') {
     year = year + 2;
   }
-  month = month > 9 ? month : '0' + month;;
+  month = month > 9 ? month : '0' + month;
   day = day > 9 ? day : '0' + day;
 
   return `${year}-${month}-${day}`;
 }
+let hours = []
+let minutes = []
+for (let index = 0; index < 24; index++) {
+  if (index < 10) index = `0${index}`
+  hours.push(`${index}`)
+}
+for (let index = 0; index < 6; index++) {
+  minutes.push(`${index}0`)
+}
+console.log(hours)
+console.log(minutes)
+
 export default {
   data () {
     return {
@@ -123,6 +170,11 @@ export default {
       wendu: 0,
       timeArray: ['10分钟', '20分钟', '30分钟', '40分钟', '50分钟', '60分钟', '70分钟', '80分钟', '90分钟', '100分钟', '110分钟', '120分钟'],
       timeIndex: 0,
+      multiArray: [
+        hours,
+        minutes
+      ],
+      multiIndex: [0, 0],
     }
   },
   onLoad (option) {
@@ -148,6 +200,15 @@ export default {
   },
   methods: {
     ...mapMutations(['setDeviceInfoItems']),
+    yuyueFn () {
+      this.showPop = true
+      const date = new Date();
+      let hour = date.getHours();
+      let minute = Number.parseInt(date.getMinutes() / 10);
+      console.log(hour, minute)
+      let multiIndex = [hour, minute]
+      this.multiIndex = multiIndex
+    },
     bindPickerChange: function(e) {
       console.log('picker发送选择改变，携带值为：' + e.target.value)
       this.timeIndex = e.target.value
@@ -174,6 +235,11 @@ export default {
     bindTimeChange (e) {
       this.time = e.target.value
     },
+    bindMultiPickerColumnChange (e) {
+      console.log('修改的列为：' + e.detail.column + '，值为：' + e.detail.value)
+      this.multiIndex[e.detail.column] = e.detail.value
+      this.$forceUpdate()
+    },
     async saveJobTime (type) {
       let prams = {
         type,
@@ -181,17 +247,20 @@ export default {
         deviceid: Number(this.deviceInfoItems.deviceid),
         modelid: this.deviceInfoItems.modelid,
         // time: type === 0 ? this.date + ' ' + this.time + ':00' : '',
+        time: type === 0 ? this.date + ' ' + this.multiArray[0][this.multiIndex[0]] + ':' + this.multiArray[1][this.multiIndex[1]] + ':00' : '',
         shichang: this.shichang,
         wendu: this.wendu
       }
-      if (type === 0) {
-        const yuyuetime = Number.parseInt(this.timeArray[this.timeIndex])
-        const timestamp = Number.parseInt(new Date().getTime()) + 60 * 1000 * yuyuetime
-        prams.time = this.$CommonJs.timestampToTime(timestamp)
-        console.log(yuyuetime)
-      } else {
-        prams.time = ''
-      }
+
+      // 旧的10分钟的实现方式
+      // if (type === 0) {
+      //   const yuyuetime = Number.parseInt(this.timeArray[this.timeIndex])
+      //   const timestamp = Number.parseInt(new Date().getTime()) + 60 * 1000 * yuyuetime
+      //   prams.time = this.$CommonJs.timestampToTime(timestamp)
+      //   console.log(yuyuetime)
+      // } else {
+      //   prams.time = ''
+      // }
       // console.log(prams)
       // return false
       const data =  await this.$server.saveJobTime(prams)

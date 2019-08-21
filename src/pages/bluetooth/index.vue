@@ -92,9 +92,9 @@ export default {
       }
     },
     connectWifi () {
-      if (this.password == '') {
-        this.$CommonJs.showToast('请输入wifi密码！')
-      } else {
+      // if (this.password == '') {
+      //   this.$CommonJs.showToast('请输入wifi密码！')
+      // } else {
         //#ifdef MP-WEIXIN
         wx.connectWifi({
           SSID: this.wifiSSID,
@@ -112,7 +112,7 @@ export default {
           }
         })
         //#endif
-      }
+      // }
     },
     // 连接设备
     connectShebei () {
