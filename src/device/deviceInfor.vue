@@ -91,9 +91,14 @@
       <view class="time-select">
         <h2>选择时间</h2>
         <view class="times">
-          <view class="date-cel">
+          <!-- <view class="date-cel">
             <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
               <view class="uni-input">{{date}}</view>
+            </picker>
+          </view> -->
+          <view class="date-cel">
+            <picker @change="bindPickerChangedanxuan" :value="shijianindex" :range="shijian">
+              <view class="uni-input">{{shijian[shijianindex]}}</view>
             </picker>
           </view>
           <!-- <view class="date-cel">
@@ -151,8 +156,6 @@ for (let index = 0; index < 24; index++) {
 for (let index = 0; index < 6; index++) {
   minutes.push(`${index}0`)
 }
-console.log(hours)
-console.log(minutes)
 
 export default {
   data () {
@@ -175,6 +178,8 @@ export default {
         minutes
       ],
       multiIndex: [0, 0],
+      shijian: ['今天', '明天'],
+      shijianindex: 0,
     }
   },
   onLoad (option) {
@@ -208,6 +213,10 @@ export default {
       console.log(hour, minute)
       let multiIndex = [hour, minute]
       this.multiIndex = multiIndex
+    },
+    bindPickerChangedanxuan (e) {
+      console.log('picker发送选择改变，携带值为：' + e.target.value)
+      this.shijianindex = e.target.value
     },
     bindPickerChange: function(e) {
       console.log('picker发送选择改变，携带值为：' + e.target.value)
@@ -247,9 +256,32 @@ export default {
         deviceid: Number(this.deviceInfoItems.deviceid),
         modelid: this.deviceInfoItems.modelid,
         // time: type === 0 ? this.date + ' ' + this.time + ':00' : '',
-        time: type === 0 ? this.date + ' ' + this.multiArray[0][this.multiIndex[0]] + ':' + this.multiArray[1][this.multiIndex[1]] + ':00' : '',
+        // time: type === 0 ? this.date + ' ' + this.multiArray[0][this.multiIndex[0]] + ':' + this.multiArray[1][this.multiIndex[1]] + ':00' : '',
         shichang: this.shichang,
         wendu: this.wendu
+      }
+
+      // 今天明天时间判断
+      if (type === 0) {
+        let timestamp = Number.parseInt(new Date().getTime())
+        if (this.shijianindex === 0) {
+          prams.time = this.$CommonJs.timestampToTime(timestamp, false, 'YMD') + this.multiArray[0][this.multiIndex[0]] + ':' + this.multiArray[1][this.multiIndex[1]] + ':00'
+        } else {
+          let timestamp_Tm = timestamp + 24 * 60 * 60 * 1000
+          prams.time = this.$CommonJs.timestampToTime(timestamp_Tm, false, 'YMD') + this.multiArray[0][this.multiIndex[0]] + ':' + this.multiArray[1][this.multiIndex[1]] + ':00'
+        }
+        let dates = prams.time.substring(0, 19).replace(/-/g,'/');
+        const formTime = new Date(dates).getTime()
+        console.log('当前日期： ', prams.time)
+        console.log('当前时间： ', timestamp)
+        console.log('预约时间： ', formTime)
+        console.log('预约时间是否小于当前时间： ', formTime < timestamp)
+        if (formTime < timestamp) {
+          this.$CommonJs.showToast('预约时间要大于当前时间！')
+          return false
+        }
+      } else {
+        prams.time = ''
       }
 
       // 旧的10分钟的实现方式
@@ -261,8 +293,10 @@ export default {
       // } else {
       //   prams.time = ''
       // }
+
       // console.log(prams)
       // return false
+
       const data =  await this.$server.saveJobTime(prams)
       this.$server.resultCallback(
 				data,

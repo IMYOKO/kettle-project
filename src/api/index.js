@@ -19,9 +19,9 @@ class BasicApi {
   postWifi (url, data, config) {
     console.log(configData.WifiUrl + url)
     return uni.request({
-      method: 'POST',
+      // method: 'GET',
       url: configData.WifiUrl + url,
-      data,
+      // data,
       header: {...config}
     })
   }
@@ -42,8 +42,14 @@ class BasicApi {
       if (res.statusCode === 200 && resultDdata.flag === 0) {
         sucssCallbak && sucssCallbak(resultDdata)
       } else {
+        let title = ''
+        if (resultDdata.errmsg) {
+          title = resultDdata.errmsg
+        } else {
+          title = '请求失败！'
+        }
         uni.showToast({
-          title: resultDdata.errmsg,
+          title,
           icon: 'none',
           duration: 2000
         });

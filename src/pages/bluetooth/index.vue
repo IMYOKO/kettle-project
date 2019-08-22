@@ -11,6 +11,10 @@
       <view class="button" @click="linkWifi" v-else>立即连接</view>
     </view>
 
+    <!-- <view class="wifi-button">
+      <view class="button" @click="wifiConnect($ConfigData.Ssid, $ConfigData.WpaPsk)">接口测试</view>
+    </view> -->
+
     <view class="wifi-pop" v-if="showConnect">
       <view class="close" @click="close">取消</view>
 
@@ -21,7 +25,7 @@
       </view>
 
       <view class="wifi-button sure">
-        <view class="button" @click="connectWifi">确定</view>
+        <view class="button" @click="connectWifi(true)">确定</view>
       </view>
     </view>
 
@@ -59,6 +63,7 @@ export default {
         console.log('网络类型： ', res.networkType);
       }
     });
+    // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
   },
   computed: {
     ...mapState(['wifi_qrcode'])
@@ -73,14 +78,17 @@ export default {
         //#ifdef MP-WEIXIN
         wx.startWifi({
           success: (res) => {
+            console.log('初始化wifi成功！');
             wx.getConnectedWifi({
               success: (WifiInfo) => {
                 // console.log(WifiInfo)
+                console.log('检测已连接的wifi成功！');
                 this.wifiSSID = WifiInfo.wifi.SSID
                 this.BSSID = WifiInfo.wifi.BSSID
                 this.showConnect = true
               },
               fail: () => {
+                console.log('检测已连接的wifi失败！');
                 this.$CommonJs.showToast('检测连接Wi-Fi失败！')
               }
             })
@@ -91,7 +99,7 @@ export default {
         this.$CommonJs.showToast('请先连接wifi！')
       }
     },
-    connectWifi () {
+    connectWifi (type) {
       // if (this.password == '') {
       //   this.$CommonJs.showToast('请输入wifi密码！')
       // } else {
@@ -101,13 +109,23 @@ export default {
           BSSID: this.BSSID,
           password: this.password,
           success: (res) => {
+            console.log('连接wifi成功！');
             this.$CommonJs.showToast('连接wifi成功！')
             this.showConnect = false
             this.connected = true
-            console.log(res.errMsg)
-            this.connectShebei()
+            console.log('连接wifi成功返回值： ', res)
+
+            // 连接设备
+            if (type) {
+              this.connectShebei()
+            }
+            // 搜索mdns
+            if (!type) {
+              this.startLocalServiceDiscovery()
+            }
           },
           fail: () => {
+            console.log('连接wifi失败！');
             this.$CommonJs.showToast('连接wifi失败！')
           }
         })
@@ -121,14 +139,15 @@ export default {
         SSID: this.$ConfigData.Ssid,
         password: this.$ConfigData.WpaPsk,
         success: (res) => {
+          console.log('连接CMD成功！');
           this.$CommonJs.showToast('连接CMD成功！')
-          // this.showConnect = false
-          // this.connected = true
-          this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
-          console.log(res.errMsg)
+          // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
+          this.wifiConnect(this.wifiSSID, this.password)
+          console.log('连接CMD成功返回值： ', res)
         },
         fail: (err) => {
           console.log(err)
+          console.log('连接CMD失败！');
           this.$CommonJs.showToast('连接CMD失败！')
         }
       })
@@ -138,14 +157,35 @@ export default {
     async wifiConnect (Ssid, WpaPsk) {
       console.log('wifi接口参数: ', Ssid, WpaPsk)
       const data = await this.$server.wifiConnect(Ssid, WpaPsk)
-      console.log(data)
+      console.log('接口返回值：', data)
       this.$server.resultCallback(
         data,
         (data) => {
+          console.log('请求CMD成功！');
           this.$CommonJs.showToast('请求CMD成功！')
-          console.log(data)
+          console.log('请求CMD成功返回值：', data)
+          // 第四步
+          this.connectWifi(false)
         }
       )
+    },
+    // mDns 
+    startLocalServiceDiscovery () {
+      //#ifdef MP-WEIXIN
+      wx.startLocalServiceDiscovery({
+        // 当前手机所连的局域网下有一个 _http._tcp. 类型的服务
+        serviceType: '_http._tcp.',
+        success: () => {
+          wx.onLocalServiceFound((res)=> {
+            console.log('mDNS 服务发现的事件的回调: ', res)
+
+          })
+        },
+        fail: () => {
+
+        }
+      })
+      //#endif
     },
     previewImage (url) {
       uni.previewImage({
