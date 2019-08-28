@@ -141,7 +141,13 @@ class Api extends BasicApi {
    * @param {String} WpaPsk
    */
   wifiConnect (Ssid, WpaPsk) {
-    return this.postWifi(`/?CMD=CMD1&Ssid=${Ssid}&WpaPsk=${WpaPsk}`, {}, { Authorization: `Basic YWRtaW46YWRtaW4=` })
+    const header = {
+      'Authorization': `Basic YWRtaW46YWRtaW4=`,
+      'Content-Type': 'text/html'
+      // 'Content-Length': 0
+    }
+    return this.postWifi(`/?CMD=CMD1&Ssid=${Ssid}&WpaPsk=${WpaPsk}`, {}, header)
+    // return this.postWifi(`/?CMD=CMD1&Ssid=${Ssid}&WpaPsk=${WpaPsk}`, {}, { Authorization: `Basic YWRtaW46YWRtaW4=` })
   }
 
 }

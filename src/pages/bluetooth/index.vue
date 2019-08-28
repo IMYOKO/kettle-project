@@ -14,6 +14,10 @@
     <!-- <view class="wifi-button">
       <view class="button" @click="wifiConnect($ConfigData.Ssid, $ConfigData.WpaPsk)">接口测试</view>
     </view> -->
+    <!-- <view class="wifi-button" v-if="connectedAgain"> -->
+    <!-- <view class="wifi-button">
+      <view class="button" @click="startLocalServiceDiscovery">测mDNS</view>
+    </view> -->
 
     <view class="wifi-pop" v-if="showConnect">
       <view class="close" @click="close">取消</view>
@@ -53,20 +57,57 @@ export default {
       networkType: '',
       password: '',
       showConnect: false,
-      connected: false
+      connected: false,
+      connectedAgain: false,
+      startWifi: false,
+      startLSD: false
     }
   },
-  onLoad() {
+  onShow() {
     uni.getNetworkType({
       success: (res) => {
         this.networkType = res.networkType
         console.log('网络类型： ', res.networkType);
       }
     });
+    // this.startLocalServiceDiscovery()
     // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
   },
+  onHide() {
+    this.wifiSSID = ''
+    this.BSSID = ''
+    this.password = ''
+    this.networkType = ''
+    this.showConnect = false
+    this.connected = false
+    this.connectedAgain = false
+    this.startWifi = false
+    this.startLSD = false
+    //#ifdef MP-WEIXIN
+    if (this.startWifi) {
+      wx.stopWifi({
+        success: (res) => {
+          console.log(res)
+        },
+        fail: (err) => {
+          console.log(err)
+        }
+      })
+    }
+    if (this.startLSD) {
+      wx.stopLocalServiceDiscovery({
+        success: (res) => {
+          console.log(res)
+        },
+        fail: (err) => {
+          console.log(err)
+        }
+      })
+    }
+    //#endif
+  },
   computed: {
-    ...mapState(['wifi_qrcode'])
+    ...mapState(['wifi_qrcode', 'userid'])
   },
   methods: {
     close () {
@@ -78,6 +119,7 @@ export default {
         //#ifdef MP-WEIXIN
         wx.startWifi({
           success: (res) => {
+            this.startWifi = true
             console.log('初始化wifi成功！');
             wx.getConnectedWifi({
               success: (WifiInfo) => {
@@ -121,7 +163,17 @@ export default {
             }
             // 搜索mdns
             if (!type) {
-              this.startLocalServiceDiscovery()
+              this.connectedAgain = true
+              if (wx.startLocalServiceDiscovery) {
+                this.startLocalServiceDiscovery()
+              } else {
+                // 如果希望用户在最新版本的客户端上体验您的小程序，可以这样子提示
+                // wx.showModal({
+                //   title: '提示',
+                //   content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
+                // })
+                this.$CommonJs.showToast('当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。')
+              }
             }
           },
           fail: () => {
@@ -158,34 +210,72 @@ export default {
       console.log('wifi接口参数: ', Ssid, WpaPsk)
       const data = await this.$server.wifiConnect(Ssid, WpaPsk)
       console.log('接口返回值：', data)
-      this.$server.resultCallback(
-        data,
-        (data) => {
-          console.log('请求CMD成功！');
-          this.$CommonJs.showToast('请求CMD成功！')
-          console.log('请求CMD成功返回值：', data)
-          // 第四步
-          this.connectWifi(false)
-        }
-      )
+      const [error, res] = data;
+      if (error) {
+        uni.showToast({
+          title: '请求失败！',
+          icon: 'none',
+          duration: 2000
+        });
+        return false
+      }
+      let resultDdata = res.data;
+      if (res.statusCode === 200) {
+        console.log('请求CMD成功！');
+        this.$CommonJs.showToast('请求CMD成功！')
+        this.connectWifi(false)
+        console.log('请求CMD成功返回值：', resultDdata)
+      } else {
+        uni.showToast({
+          title: '请求失败了！',
+          icon: 'none',
+          duration: 2000
+        });
+      }
     },
     // mDns 
     startLocalServiceDiscovery () {
       //#ifdef MP-WEIXIN
+      uni.showLoading({
+        title: '配网中，请等待...'
+      });
       wx.startLocalServiceDiscovery({
-        // 当前手机所连的局域网下有一个 _http._tcp. 类型的服务
-        serviceType: '_http._tcp.',
+        // 当前手机所连的局域网下有一个 _music._tcp 类型的服务
+        // _kettle._tcp
+        serviceType: '_kettle._tcp', // _music._tcp
         success: () => {
+          this.startLSD = true
+          console.log('startLocalServiceDiscovery success')
           wx.onLocalServiceFound((res)=> {
             console.log('mDNS 服务发现的事件的回调: ', res)
-
+            uni.hideLoading()
+            if (res.serviceName && res.serviceName.length === 12) {
+              this.$CommonJs.showToast('配网成功！')
+              uni.showLoading({
+                title: '开始绑定设备...'
+              });
+              this.addDevice(res.serviceName)
+            } else {
+              this.$CommonJs.showToast('配网失败！')
+            }
           })
         },
         fail: () => {
-
+          this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
+          console.log('startLocalServiceDiscovery失败: ')
+          uni.hideLoading();
         }
       })
       //#endif
+    },
+    // 绑定设备
+    async addDevice (mac) {
+      const data = await this.$server.addDevice({userid: this.userid, mac})
+      uni.hideLoading()
+      this.$server.resultCallback(data,
+			(data) => {
+        this.$CommonJs.showToast('绑定成功！')
+      })
     },
     previewImage (url) {
       uni.previewImage({
