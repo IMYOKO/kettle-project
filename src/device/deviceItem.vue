@@ -1,53 +1,62 @@
 <template>
-  <view class="device-detail">
-    <ul class="device-list">
-      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index <= 5'>
-        <view class="device-item">
-          <view class="item">
-            <view class="img-box">
+  <view class="device">
+    <!-- 预约时间 start -->
+    <view class="has-yuyue">
+      <h3>已预约</h3>
+      <h4>今天18:30完成烹饪</h4>
+      <button>取消</button>
+    </view>
+    <!-- 预约时间 end -->
+    <view class="device-detail">
+      <ul class="device-list">
+        <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index <= 5'>
+          <view class="device-item">
+            <view class="item">
+              <view class="img-box">
+                <image :src='item.modellogo' />
+              </view>
+              <view class="name">{{item.modelname}}</view>
+            </view>
+          </view>
+        </li>
+      </ul>
+
+      <view class="more-device" v-if='deviceInfoItem.length > 6'>更多模式</view>
+      <ul class="shebei-list">
+        <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index > 5'>
+          <view class="item clearfix">
+            <view class="icon">
               <image :src='item.modellogo' />
             </view>
-            <view class="name">{{item.modelname}}</view>
+            <view class="text">{{item.modelname}}</view>
+            <view class="next"></view>
           </view>
-        </view>
-      </li>
-    </ul>
-
-    <view class="more-device" v-if='deviceInfoItem.length > 6'>更多模式</view>
-    <ul class="shebei-list">
-      <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index > 5'>
-        <view class="item clearfix">
-          <view class="icon">
-            <image :src='item.modellogo' />
+        </li>
+        <!-- <li>
+          <view class="item clearfix">
+            <view class="icon icon-02"></view>
+            <view class="text">功能1</view>
+            <view class="next"></view>
           </view>
-          <view class="text">{{item.modelname}}</view>
-          <view class="next"></view>
-        </view>
-      </li>
-      <!-- <li>
-        <view class="item clearfix">
-          <view class="icon icon-02"></view>
-          <view class="text">功能1</view>
-          <view class="next"></view>
-        </view>
-      </li>
-      <li>
-        <view class="item clearfix">
-          <view class="icon icon-03"></view>
-          <view class="text">功能1</view>
-          <view class="next"></view>
-        </view>
-      </li> -->
-    </ul>
+        </li>
+        <li>
+          <view class="item clearfix">
+            <view class="icon icon-03"></view>
+            <view class="text">功能1</view>
+            <view class="next"></view>
+          </view>
+        </li> -->
+      </ul>
 
-    <!-- 客服 -->
-    <view class="contact" @click="setCodeType(true)"></view>
-    <!-- 固件 -->
-    <view class="contact ota" v-if="have_newota === 1" @click="setOtaType(true)"></view>
+      <!-- 客服 -->
+      <view class="contact" @click="setCodeType(true)"></view>
+      <!-- 固件 -->
+      <view class="contact ota" v-if="have_newota === 1" @click="setOtaType(true)"></view>
 
 
-    <Code v-if="showCodePop" :kf_img='kf_img' :kf_mobile='kf_mobile' />
-    <Ota v-if="showOtaPop" :ota_name='ota_name' :ota_version='ota_version' :deviceid='deviceid' :ota_time='ota_time' :upOtaCallback='upOtaCallback' />
+      <Code v-if="showCodePop" :kf_img='kf_img' :kf_mobile='kf_mobile' />
+      <Ota v-if="showOtaPop" :ota_name='ota_name' :ota_version='ota_version' :deviceid='deviceid' :ota_time='ota_time' :upOtaCallback='upOtaCallback' />
+    </view>
   </view>
 </template>
 
@@ -121,6 +130,38 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.has-yuyue {
+  background: #fff;
+  padding: 10px 30px;
+  border-top: 1px solid #f1f1f1;
+  position: relative;
+  h3, h4 {
+    font-size: 15px;
+    line-height: 25px;
+    color: #666;
+  }
+  h4 {
+    font-size: 13px;
+    margin-top: 5px;
+  }
+  button {
+    width: 60px;
+    height: 25px;
+    line-height: 25px;
+    background: #ececee;
+    color: #666;
+    font-size: 13px;
+    text-align: center;
+    position: absolute;
+    bottom: 12px;
+    right: 30px;
+    border: none;
+    border-radius: 0;
+    &::after {
+      border: none;
+    }
+  }
+}
 .device-detail {
   padding: 10px 20upx;
 

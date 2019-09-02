@@ -60,7 +60,8 @@ export default {
       connected: false,
       connectedAgain: false,
       startWifi: false,
-      startLSD: false
+      startLSD: false,
+      udpSocket: null
     }
   },
   onShow() {
@@ -83,6 +84,7 @@ export default {
     this.connectedAgain = false
     this.startWifi = false
     this.startLSD = false
+    this.udpSocket = null
     //#ifdef MP-WEIXIN
     if (this.startWifi) {
       wx.stopWifi({
@@ -142,47 +144,39 @@ export default {
       }
     },
     connectWifi (type) {
-      // if (this.password == '') {
-      //   this.$CommonJs.showToast('请输入wifi密码！')
-      // } else {
-        //#ifdef MP-WEIXIN
-        wx.connectWifi({
-          SSID: this.wifiSSID,
-          BSSID: this.BSSID,
-          password: this.password,
-          success: (res) => {
-            console.log('连接wifi成功！');
-            this.$CommonJs.showToast('连接wifi成功！')
-            this.showConnect = false
-            this.connected = true
-            console.log('连接wifi成功返回值： ', res)
+      //#ifdef MP-WEIXIN
+      wx.connectWifi({
+        SSID: this.wifiSSID,
+        BSSID: this.BSSID,
+        password: this.password,
+        success: (res) => {
+          console.log('连接wifi成功！');
+          this.$CommonJs.showToast('连接wifi成功！')
+          this.showConnect = false
+          this.connected = true
+          console.log('连接wifi成功返回值： ', res)
 
-            // 连接设备
-            if (type) {
-              this.connectShebei()
-            }
-            // 搜索mdns
-            if (!type) {
-              this.connectedAgain = true
-              if (wx.startLocalServiceDiscovery) {
-                this.startLocalServiceDiscovery()
-              } else {
-                // 如果希望用户在最新版本的客户端上体验您的小程序，可以这样子提示
-                // wx.showModal({
-                //   title: '提示',
-                //   content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
-                // })
-                this.$CommonJs.showToast('当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。')
-              }
-            }
-          },
-          fail: () => {
-            console.log('连接wifi失败！');
-            this.$CommonJs.showToast('连接wifi失败！')
+          // 连接设备
+          if (type) {
+            this.connectShebei()
           }
-        })
-        //#endif
-      // }
+          // 搜索mdns
+          if (!type) {
+            this.connectedAgain = true
+            if (wx.startLocalServiceDiscovery) {
+              this.startLocalServiceDiscovery()
+            } else {
+              // 如果希望用户在最新版本的客户端上体验您的小程序，可以这样子提示
+              this.$CommonJs.showToast('当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。')
+            }
+          }
+        },
+        fail: () => {
+          console.log('连接wifi失败！');
+          this.$CommonJs.showToast('连接wifi失败！')
+        }
+      })
+      //#endif
     },
     // 连接设备
     connectShebei () {
@@ -193,7 +187,8 @@ export default {
         success: (res) => {
           console.log('连接CMD成功！');
           this.$CommonJs.showToast('连接CMD成功！')
-          // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
+          // udp配网
+          // wifi配网
           this.wifiConnect(this.wifiSSID, this.password)
           console.log('连接CMD成功返回值： ', res)
         },
@@ -232,6 +227,25 @@ export default {
           duration: 2000
         });
       }
+    },
+    // udp 
+    initUdpSocket () {
+      //#ifdef MP-WEIXIN
+      this.udpSocket = wx.createUDPSocket();
+      if (this.udpSocket) {
+        const locationPort = this.udpSocket.bind()
+        this.udpSocket.onListening((res) => {
+          console.log('onListening...')
+          console.log(res)
+        })
+        this.udpSocket.onMessage((res) => {
+          console.log('onMessage....')
+          console.log(res)
+        })
+      } else {
+        this.$CommonJs.showToast('当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。')
+      }
+      //#endif
     },
     // mDns 
     startLocalServiceDiscovery () {

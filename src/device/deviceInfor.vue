@@ -1,132 +1,150 @@
 <template>
-  <view class="devices-infor">
-    <view class="ad-wrapper" v-if="deviceInfoItems.img_path">
-      <image :src="deviceInfoItems.img_path" />
-    </view>
-    <view class="caipu-title">查看菜谱</view>
-    <view class="caipu-content">
-      {{deviceInfoItems.peifang}}
-    </view>
-    <view class="infor-wrapper">
-      <view class="baowen">
-        <view class="title">保温</view>
-        <switch class="swicth" :checked="baowen" @change="switchChange" />
+  <view class="devices">
+    <view class="has-devices">
+      <view class="top-box">
+        <h3>水果茶</h3>
+        <h5>预约中</h5>
+        <h5 class="mt-180">您已预约今天18:12完成烹饪</h5>
+        <h1>12:23:34</h1>
       </view>
-      <ul class="time-wrapper">
-        <li>
-          <view class="time">保温时长 <text class="span">{{shichang}}小时</text><text class="em"></text></view>
-          <slider class="slider-wen" :value="shichang" @change="sliderChangeSC" min="0" max="12" />
-          <view class="text">
-            <text>0小时</text>
-            <text>12小时</text>
-          </view>
-        </li>
-        <li>
-          <view class="time">保温温度 <text class="span">{{wendu}}℃</text><text class="em"></text></view>
-          <slider class="slider-wen" :value="wendu" @change="sliderChangeWD" min="0" max="100" />
-          <view class="text">
-            <text>0℃</text>
-            <text>100℃</text>
-          </view>
-        </li>
-      </ul>
-      <view class="button" v-if="showButton">
-        <view class="button-wrapper">
-          <text @click="yuyueFn">预约</text>
-          <text @click="saveJobTime(1)">确定</text>
+      <view class="bottom-box">
+        <view class="quxiao">
+          <view class="quxiao-inner">取消</view>
         </view>
       </view>
-      <view class="button" v-else>
-        <view class="button-wrapper">
-          <text>设备工作中...</text>
-        </view>
-      </view>
-    </view>
 
-    <!-- 预约弹窗 新版 -->
-    <!-- <view class="yuyue-pop" v-if='showPop'>
-      <view class="time-select">
-        <h2>选择预约时间</h2>
-        <view class="times">
-          <view class="date-cel">
-            <picker @change="bindPickerChange" :value="timeIndex" :range="timeArray">
-              <view class="uni-input">{{timeArray[timeIndex]}}</view>
-            </picker>
-          </view>
-        </view>
-        <view class="button-box">
-          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
-        </view>
-      </view>
-      <view class="bg" @click="showPop = false"></view>
-    </view> -->
-    <!-- 预约弹窗 新版 -->
-
-    <!-- 预约弹窗 旧版 -->
-    <!-- <view class="yuyue-pop" v-if='false'>
-      <view class="time-select">
-        <h2>选择时间</h2>
-        <view class="times">
-          <view class="date-cel">
-            <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
-              <view class="uni-input">{{date}}</view>
-            </picker>
-          </view>
-          <view class="date-cel">
-            <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
-              <view class="uni-input">{{time}}:00</view>
-            </picker>
-          </view>
-        </view>
-        <view class="button-box">
-          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
-        </view>
-      </view>
-      <view class="bg" @click="showPop = false"></view>
-    </view> -->
-    <!-- 预约弹窗 旧版 -->
-
-    <!-- 预约弹窗 第三版 -->
-    <view class="yuyue-pop" v-if='showPop'>
-      <view class="time-select">
-        <h2>选择时间</h2>
-        <view class="times">
-          <!-- <view class="date-cel">
-            <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
-              <view class="uni-input">{{date}}</view>
-            </picker>
-          </view> -->
-          <view class="date-cel">
-            <picker @change="bindPickerChangedanxuan" :value="shijianindex" :range="shijian">
-              <view class="uni-input">{{shijian[shijianindex]}}</view>
-            </picker>
-          </view>
-          <!-- <view class="date-cel">
-            <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
-              <view class="uni-input">{{time}}:00</view>
-            </picker>
-          </view> -->
-          <view class="date-cel">
-            <!-- <picker mode="multiSelector" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
-              <view class="uni-input">{{time}}:00</view>
-            </picker> -->
-            <picker mode="multiSelector" @columnchange="bindMultiPickerColumnChange" :value="multiIndex" :range="multiArray">
-              <view class="uni-input">{{multiArray[0][multiIndex[0]]}}:{{multiArray[1][multiIndex[1]]}}:00</view>
-            </picker>
-          </view>
-        </view>
-        <view class="button-box">
-          <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
-        </view>
-      </view>
-      <view class="bg" @click="showPop = false"></view>
+      <CancelPop />
     </view>
-    <!-- 预约弹窗 旧版 -->
+    <view class="devices-infor" v-if="false">
+      <view class="ad-wrapper" v-if="deviceInfoItems.img_path">
+        <image :src="deviceInfoItems.img_path" />
+      </view>
+      <view class="caipu-title">查看菜谱</view>
+      <view class="caipu-content">
+        {{deviceInfoItems.peifang}}
+      </view>
+      <view class="infor-wrapper">
+        <view class="baowen">
+          <view class="title">保温</view>
+          <switch class="swicth" :checked="baowen" @change="switchChange" />
+        </view>
+        <ul class="time-wrapper">
+          <li>
+            <view class="time">保温时长 <text class="span">{{shichang}}小时</text><text class="em"></text></view>
+            <slider class="slider-wen" :value="shichang" @change="sliderChangeSC" min="0" max="12" />
+            <view class="text">
+              <text>0小时</text>
+              <text>12小时</text>
+            </view>
+          </li>
+          <li>
+            <view class="time">保温温度 <text class="span">{{wendu}}℃</text><text class="em"></text></view>
+            <slider class="slider-wen" :value="wendu" @change="sliderChangeWD" min="0" max="100" />
+            <view class="text">
+              <text>0℃</text>
+              <text>100℃</text>
+            </view>
+          </li>
+        </ul>
+        <view class="button" v-if="showButton">
+          <view class="button-wrapper">
+            <text @click="yuyueFn">预约</text>
+            <text @click="saveJobTime(1)">确定</text>
+          </view>
+        </view>
+        <view class="button" v-else>
+          <view class="button-wrapper">
+            <text>设备工作中...</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 预约弹窗 新版 -->
+      <!-- <view class="yuyue-pop" v-if='showPop'>
+        <view class="time-select">
+          <h2>选择预约时间</h2>
+          <view class="times">
+            <view class="date-cel">
+              <picker @change="bindPickerChange" :value="timeIndex" :range="timeArray">
+                <view class="uni-input">{{timeArray[timeIndex]}}</view>
+              </picker>
+            </view>
+          </view>
+          <view class="button-box">
+            <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
+          </view>
+        </view>
+        <view class="bg" @click="showPop = false"></view>
+      </view> -->
+      <!-- 预约弹窗 新版 -->
+
+      <!-- 预约弹窗 旧版 -->
+      <!-- <view class="yuyue-pop" v-if='false'>
+        <view class="time-select">
+          <h2>选择时间</h2>
+          <view class="times">
+            <view class="date-cel">
+              <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
+                <view class="uni-input">{{date}}</view>
+              </picker>
+            </view>
+            <view class="date-cel">
+              <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
+                <view class="uni-input">{{time}}:00</view>
+              </picker>
+            </view>
+          </view>
+          <view class="button-box">
+            <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
+          </view>
+        </view>
+        <view class="bg" @click="showPop = false"></view>
+      </view> -->
+      <!-- 预约弹窗 旧版 -->
+
+      <!-- 预约弹窗 第三版 -->
+      <view class="yuyue-pop" v-if='showPop'>
+        <view class="time-select">
+          <h2>选择时间</h2>
+          <view class="times">
+            <!-- <view class="date-cel">
+              <picker mode="date" :value="date" :start="startDate" :end="endDate" @change="bindDateChange">
+                <view class="uni-input">{{date}}</view>
+              </picker>
+            </view> -->
+            <view class="date-cel">
+              <picker @change="bindPickerChangedanxuan" :value="shijianindex" :range="shijian">
+                <view class="uni-input">{{shijian[shijianindex]}}</view>
+              </picker>
+            </view>
+            <!-- <view class="date-cel">
+              <picker mode="time" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
+                <view class="uni-input">{{time}}:00</view>
+              </picker>
+            </view> -->
+            <view class="date-cel">
+              <!-- <picker mode="multiSelector" :value="time" start="00:00" end="23:59" @change="bindTimeChange">
+                <view class="uni-input">{{time}}:00</view>
+              </picker> -->
+              <picker mode="multiSelector" @columnchange="bindMultiPickerColumnChange" :value="multiIndex" :range="multiArray">
+                <view class="uni-input">{{multiArray[0][multiIndex[0]]}}:{{multiArray[1][multiIndex[1]]}}:00</view>
+              </picker>
+            </view>
+          </view>
+          <view class="button-box">
+            <text @click="() => {showPop = false; saveJobTime(0)}" >确定预约</text>
+          </view>
+        </view>
+        <view class="bg" @click="showPop = false"></view>
+      </view>
+      <!-- 预约弹窗 旧版 -->
+    </view>
   </view>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import CancelPop from '../component/cancel'
 function getDate(type) {
   const date = new Date();
 
@@ -306,11 +324,63 @@ export default {
 				}
 			)
     }
+  },
+  components: {
+    CancelPop
   }
 }
 </script>
 
 <style lang="less" scoped>
+.has-devices {
+  min-height: 100vh;
+  background: #fff;
+  text-align: center;
+  .top-box {
+    padding: 20px 0px 18%;
+    background: #feb070;
+  }
+  .bottom-box {
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+    .quxiao {
+      width: 120px;
+      height: 120px;
+      border-radius: 120px;
+      text-align: center;
+      line-height: 120px;
+      padding: 5px;
+      border: 1px solid #feb070;
+
+      .quxiao-inner {
+        font-size: 30px;
+        color: #fff;
+        border-radius: 120px;
+        background: #feb070;
+      }
+    }
+  }
+  h3 {
+    color: #000;
+    font-size: 15px;
+    line-height: 25px;
+  }
+  h5 {
+    color: #333;
+    font-size: 12px;
+    line-height: 25px;
+    &.mt-180 {
+      margin-top: 18%;
+    }
+  }
+  h1 {
+    color: #fff;
+    font-size: 50px;
+    line-height: 70px;
+    letter-spacing: 8px;
+  }
+}
 .devices-infor {
   padding: 15px;
 

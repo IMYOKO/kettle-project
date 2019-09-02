@@ -11,6 +11,34 @@
     <view class="button-wrapper">
      <view class="button" @click="sumbit">确定</view>
     </view>
+
+    <view class="scan-wrapper">
+      <view class="scan-box">
+        <view class="scan-botton">
+          <view class="scan-inner">
+            扫描附近设备
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="device">
+      <h3>已发现设备</h3>
+      <ul class="device-list">
+        <li>
+          <text>设备1</text>
+          <text>未连接</text>
+        </li>
+        <li>
+          <text>设备1</text>
+          <text>未连接</text>
+        </li>
+        <li>
+          <text>设备1</text>
+          <text>未连接</text>
+        </li>
+      </ul>
+    </view>
   </view>
 </template>
 
@@ -113,6 +141,66 @@ export default {
           margin-top: 5px;
           width: 30px;
           height: 30px;
+        }
+      }
+    }
+  }
+
+  .scan-wrapper {
+    padding:  40px 0;
+
+    .scan-box {
+      display: flex;
+      justify-content: center;
+
+      .scan-botton {
+        width: 100px;
+        height: 100px;
+        border-radius: 100px;
+        text-align: center;
+        line-height: 100px;
+        padding: 5px;
+        border: 1px solid #7993b7;
+
+        .scan-inner {
+          font-size: 12px;
+          color: #fff;
+          border-radius: 100px;
+          background: #7993b7;
+        }
+      }
+    }
+  }
+
+  .device {
+    background: #e6e5ea;
+    border-radius: 5px;
+
+    h3 {
+      height: 64px;
+      line-height: 64px;
+      color: #7993b7;
+      font-size: 15px;
+      text-align: center;
+      border-bottom: 1px solid #fff;
+    }
+    .device-list {
+      li {
+        padding: 0 15px;
+        height: 44px;
+        line-height: 44px;
+        border-bottom: 1px solid #fff;
+        &:last-child {
+          border-bottom: none;
+        }
+        display: flex;
+        justify-content: space-between;
+        text {
+          font-size: 14px;
+          color: #333;
+          &:last-of-type {
+            color: #999;
+          }
         }
       }
     }
