@@ -15,7 +15,7 @@
     <view class="scan-wrapper">
       <view class="scan-box">
         <view class="scan-botton">
-          <view class="scan-inner">
+          <view class="scan-inner" @click="startLocalServiceDiscovery">
             扫描附近设备
           </view>
         </view>
@@ -24,18 +24,10 @@
 
     <view class="device">
       <h3>已发现设备</h3>
-      <ul class="device-list">
-        <li>
-          <text>设备1</text>
-          <text>未连接</text>
-        </li>
-        <li>
-          <text>设备1</text>
-          <text>未连接</text>
-        </li>
-        <li>
-          <text>设备1</text>
-          <text>未连接</text>
+      <ul class="device-list" v-if="deviceList.length > 0">
+        <li v-for="(item, index) in deviceList" :key="index" @click="connectDevice(item.serviceName)">
+          <text>{{item.serviceName}}</text>
+          <!-- <text>未连接</text> -->
         </li>
       </ul>
     </view>
@@ -47,11 +39,19 @@ import {mapState, mapMutations} from 'vuex'
 export default {
   data () {
     return {
-      mac: ''
+      mac: '',
+      deviceList: [],
+      timer: null,
+      count: 0
     }
   },
   computed: {
     ...mapState(['userid'])
+  },
+  onUnload () {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
   },
   methods: {
     getScanCode () {
@@ -78,6 +78,54 @@ export default {
           uni.navigateBack()
         }, 500)
 			})
+    },
+    connectDevice (mac) {
+      this.mac = mac
+      this.sumbit()
+    },
+    // mDns 
+    startLocalServiceDiscovery () {
+      //#ifdef MP-WEIXIN
+      uni.showLoading({
+        title: '扫描中，请等待...'
+      });
+      this.timer = setInterval(() => {
+        this.count ++ 
+        if (this.count >= 30) {
+          clearInterval(this.timer)
+          uni.hideLoading();
+          wx.stopLocalServiceDiscovery({
+            success: () => {
+              console.log('停止 dns 扫描成功。')
+            },
+            fail: () => {
+              console.log('停止 dns 扫描失败。')
+            }
+          })
+        }
+      }, 1000)
+      wx.startLocalServiceDiscovery({
+        // 当前手机所连的局域网下有一个 _kettle._tcp 类型的服务
+        serviceType: '_kettle._tcp',
+        success: () => {
+          // this.startLSD = true
+          console.log('startLocalServiceDiscovery success')
+          wx.onLocalServiceFound((res)=> {
+            console.log('mDNS 服务发现的事件的回调: ', res)
+            uni.hideLoading()
+            if (res.serviceName && res.serviceName.length === 12) {
+              this.deviceList.push(res)
+              console.log('deviceList: ', this.deviceList)
+            }
+          })
+        },
+        fail: () => {
+          this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
+          console.log('startLocalServiceDiscovery失败: ')
+          uni.hideLoading();
+        }
+      })
+      //#endif
     }
   }
 }

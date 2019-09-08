@@ -6,16 +6,51 @@
         <text>取消预约？</text>
       </view>
       <view class="button-wrapper">
-        <text>取消</text>
-        <text>确定</text>
+        <text @click="setCancelPopType(false)">取消</text>
+        <text @click="overDeviceYy">确定</text>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
-  
+  props: {
+    where: String,
+    modelid: Number,
+    deviceid: Number
+  },
+  data() {
+    return {}
+  },
+  computed: {
+    ...mapState(['showCancelPop', 'userid'])
+  },
+  methods: {
+    ...mapMutations(['setCancelPopType']),
+    async overDeviceYy () {
+      const prams = {
+        userid: this.userid,
+        deviceid: this.deviceid,
+        modelid: this.modelid
+      }
+      const data = await this.$server.overDeviceYy(prams)
+      this.$server.resultCallback(
+				data,
+				(data) => {
+          this.$CommonJs.showToast('操作成功！')
+          this.setCancelPopType(false)
+          // this.$emit('queryDeviceInfo', {userid: this.userid, deviceid: this.deviceid})
+          if (this.where === 'deviceItem') {
+            this.$emit('cancelCallback')
+          } else {
+            uni.navigateBack({})
+          }
+				}
+			)
+    }
+  }
 }
 </script>
 
@@ -50,6 +85,7 @@ export default {
     transform: translate(-50%, -50%);
 
     .input-box {
+      text-align: center;
       margin-bottom: 5px;
       border-bottom: 1px solid #dedede;
       input {

@@ -15,6 +15,14 @@
 			</swiper>
 		</view>
 
+		<ul>
+			<li v-for="(item, index) in devices" :key="index">
+				<view>{{item.RSSI}}</view>
+				<view>{{item.deviceId}}</view>
+				<view>{{item.name}}</view>
+			</li>
+		</ul>
+
 		<!-- <button
 			v-if="isdevelopment"
 			open-type="getUserInfo"
@@ -48,6 +56,7 @@
 <script>
 import {mapState, mapMutations} from 'vuex'
 import DeviceList from '../../component/deviceList'
+import { log } from 'util';
 export default {
 	data() {
 		return {
@@ -59,7 +68,8 @@ export default {
 			duration: 500,
 			deviceItem: [],
 			bannerItem: [],
-			newsItem: []
+			newsItem: [],
+			devices: []
 		}
 	},
 	onShow() {
@@ -75,6 +85,72 @@ export default {
 		...mapMutations(['setUserInfor', 'setNewsItems']),
 		getuserinfo(e) {
 			console.log(e)
+		},
+		lanya () {
+			function ab2hex(buffer) {
+				const hexArr = Array.prototype.map.call(
+					new Uint8Array(buffer),
+					function (bit) {
+						return ('00' + bit.toString(16)).slice(-2)
+					}
+				)
+				return hexArr.join('')
+			}
+			uni.openBluetoothAdapter({
+				success: (res) => {
+					console.log('初始化蓝牙成功！')
+					this.$CommonJs.showToast('初始化蓝牙成功！')
+					uni.startBluetoothDevicesDiscovery({
+						allowDuplicatesKey: false,
+						interval: 0,
+						success: (res) => {
+							console.log('开始搜索蓝牙！')
+							uni.showLoading({
+								title: '开始搜索蓝牙！'
+							});
+							uni.getBluetoothDevices({
+								success: (res) => {
+									console.log('蓝牙: ', res.devices)
+									// uni.hideLoading()
+									// const list = res.devices
+									// this.devices = list
+									uni.onBluetoothDeviceFound((devices) => {
+										console.log('new device list has founded')
+										console.log(devices)
+										console.log(devices.devices[0])
+										const devicesList = this.devices.slice(0)
+										let hasDevices = false
+										devicesList.map(item => {
+											if (item.deviceId === devices.devices[0].deviceId) {
+												hasDevices = true
+											}
+										})
+										if (!hasDevices) {
+											this.devices.push(devices.devices[0])
+										}
+										if (devices.devices[0].name === 'YOKO') {
+											uni.hideLoading()
+											this.$CommonJs.showToast('找到yoko, 停止搜索')
+											uni.stopBluetoothDevicesDiscovery({
+												success: (res) => {
+													console.log('停止搜索蓝牙！')
+												}
+											})
+										}
+									})
+								}
+							})
+							console.log(res)
+						},
+						fail (err) {
+							console.log(err)
+						}
+					})
+				},
+				fail (err) {
+					console.log(err)
+				}
+			})
 		},
 		goWebView (url) {
 			this.$CommonJs.pathTo('/infor/webView?url=' + url)

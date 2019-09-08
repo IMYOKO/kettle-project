@@ -7,6 +7,7 @@ const state = {
   shareType: false,
   showOtaPop: false,
   showCodePop: false,
+  showCancelPop: false,
   userid: uni.getStorageSync('userid') || '', // 用户id
   username: uni.getStorageSync('username') || '', // 用户账号
   nickname: uni.getStorageSync('nickname') || '', // 昵称
@@ -30,6 +31,12 @@ const state = {
     title: '',
     content: '',
     addtime: '',
+  },
+  yuyueInfor: {
+    yy_modelid: null,
+    yy_modelname: "",
+    yy_overtime: "",
+    yy_status: ""
   }
 }
 
@@ -42,6 +49,9 @@ const mutations = {
   },
   setOtaType (state, value) {
     state.showOtaPop = value
+  },
+  setCancelPopType (state, value) {
+    state.showCancelPop = value
   },
   setMobile (state, mobile) {
     state.mobile = mobile
@@ -72,6 +82,9 @@ const mutations = {
   },
   setNewsItems (state, payload) {
     state.newsItems = Object.assign({}, payload)
+  },
+  setYuyueInfor (state, payload) {
+    state.yuyueInfor = Object.assign({}, payload)
   }
 }
 

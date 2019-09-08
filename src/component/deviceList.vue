@@ -48,8 +48,8 @@ export default {
         devicemac: '',
         devicename: '',
         devicelogo: '',
-        status: null,
-        is_zhu: null,
+        status: null, // 设备状态 0空闲  1工作中  2离线”
+        is_zhu: null, // 是否是主用户  0否  1是   主用户可以删除子用户、分享给用户、编辑设备。为0则无权限
       }
     }
   },

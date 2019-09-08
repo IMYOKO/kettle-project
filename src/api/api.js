@@ -150,6 +150,16 @@ class Api extends BasicApi {
     // return this.postWifi(`/?CMD=CMD1&Ssid=${Ssid}&WpaPsk=${WpaPsk}`, {}, { Authorization: `Basic YWRtaW46YWRtaW4=` })
   }
 
+  /**
+   *  取消预约
+   * @param {Number} userid
+   * @param {Number} deviceid
+   * @param {Number} modelid
+   */
+  overDeviceYy (data) {
+    return this.post(`/api/overDeviceYy.htm`, data, {})
+  }
+
 }
 
 export default new Api()

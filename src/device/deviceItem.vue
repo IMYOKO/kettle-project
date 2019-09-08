@@ -1,10 +1,12 @@
 <template>
   <view class="device">
     <!-- 预约时间 start -->
-    <view class="has-yuyue">
+    <view class="has-yuyue" v-if="yy_modelid">
       <h3>已预约</h3>
-      <h4>今天18:30完成烹饪</h4>
-      <button>取消</button>
+      <h4>{{yy_overtime}} {{yy_status === '0' ? '进行' : yy_status === '1' ? '完成' : ''}}烹饪</h4>
+      <button @click="setCancelPopType(true)">取消</button>
+
+      <CancelPop v-if="showCancelPop" where='deviceItem' :modelid='yy_modelid' :deviceid='deviceid' @queryDeviceInfo='queryDeviceInfo' @cancelCallback='cancelCallback' />
     </view>
     <!-- 预约时间 end -->
     <view class="device-detail">
@@ -64,6 +66,7 @@
 import { mapState, mapMutations } from 'vuex'
 import Code from '../component/code'
 import Ota from '../component/ota'
+import CancelPop from '../component/cancel'
 export default {
   data () {
     return {
@@ -75,7 +78,11 @@ export default {
       ota_name: '',
       ota_version: '',
       ota_time: '',
-      deviceid: null
+      deviceid: null,
+      yy_modelid: null,
+      yy_modelname: "",
+      yy_overtime: "",
+      yy_status: "" // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
     }
   },
   onLoad(option) {
@@ -86,11 +93,16 @@ export default {
     })
     this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
+  onShow() {
+    if (this.deviceid) {
+      this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
+    }
+  },
   computed: {
-    ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems'])
+    ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop'])
   },
   methods: {
-    ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems']),
+    ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor']),
     async queryDeviceInfo (prams) {
       const data = await this.$server.queryDeviceInfo(prams)
       this.$server.resultCallback(
@@ -103,10 +115,26 @@ export default {
 					this.ota_name = data.ota_name
 					this.ota_version = data.ota_version
           this.ota_time = data.ota_time
+          this.yy_modelid = data.yy_modelid
+          this.yy_modelname = data.yy_modelname
+          this.yy_overtime = data.yy_overtime
+          this.yy_status = data.yy_status
+          if (this.yy_modelid) {
+            this.setYuyueInfor({
+              yy_modelid: data.yy_modelid,
+              yy_modelname: data.yy_modelname,
+              yy_overtime: data.yy_overtime,
+              yy_status: data.yy_status
+            })
+          }
 				}
 			)
     },
     goDevicePage (item) {
+      if (this.yy_modelid && this.yy_modelid !== item.modelid) {
+        this.$CommonJs.showToast('当前设备已有预约！')
+        return
+      }
       this.$CommonJs.pathTo('/device/deviceInfor?modelid=' + item.modelid + '&title=' + item.modelname)
       const payload = {
         deviceid: this.deviceid,
@@ -120,11 +148,25 @@ export default {
     upOtaCallback () {
       this.setOtaType(false)
       this.have_newota = 0
+    },
+    // 取消预约后
+    cancelCallback () {
+      this.yy_modelid = null
+      this.yy_modelname = ""
+      this.yy_overtime = ""
+      this.yy_status = ""
+      this.setYuyueInfor({
+        yy_modelid: null,
+        yy_modelname: "",
+        yy_overtime: "",
+        yy_status: ""
+      })
     }
   },
   components: {
     Code,
-    Ota
+    Ota,
+    CancelPop
   }
 }
 </script>
@@ -132,7 +174,7 @@ export default {
 <style lang="less" scoped>
 .has-yuyue {
   background: #fff;
-  padding: 10px 30px;
+  padding: 10px 20px;
   border-top: 1px solid #f1f1f1;
   position: relative;
   h3, h4 {

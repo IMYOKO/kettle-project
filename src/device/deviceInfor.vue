@@ -1,21 +1,21 @@
 <template>
   <view class="devices">
-    <view class="has-devices">
+    <view class="has-devices" v-if="isYuyue">
       <view class="top-box">
-        <h3>水果茶</h3>
-        <h5>预约中</h5>
-        <h5 class="mt-180">您已预约今天18:12完成烹饪</h5>
-        <h1>12:23:34</h1>
+        <h3>{{yuyueInfor.yy_modelname}}</h3>
+        <h5>{{yuyueInfor.yy_status === '0' ? '预约' : yuyueInfor.yy_status === '1' ? '进行' : ''}}中</h5>
+        <h5 class="mt-180">您已预约 {{yuyueInfor.yy_overtime}} {{yuyueInfor.yy_status === '0' ? '进行' : yuyueInfor.yy_status === '1' ? '完成' : ''}}烹饪</h5>
+        <h1>{{syTime}}</h1>
       </view>
       <view class="bottom-box">
         <view class="quxiao">
-          <view class="quxiao-inner">取消</view>
+          <view class="quxiao-inner" @click="setCancelPopType(true)">取消</view>
         </view>
       </view>
 
-      <CancelPop />
+      <CancelPop v-if="showCancelPop" where='deviceInfo' :modelid='deviceInfoItems.modelid' :deviceid='deviceInfoItems.deviceid' />
     </view>
-    <view class="devices-infor" v-if="false">
+    <view class="devices-infor" v-else>
       <view class="ad-wrapper" v-if="deviceInfoItems.img_path">
         <image :src="deviceInfoItems.img_path" />
       </view>
@@ -198,12 +198,22 @@ export default {
       multiIndex: [0, 0],
       shijian: ['今天', '明天'],
       shijianindex: 0,
+      isYuyue: false,
+      timer: null,
+      syTime: '00:00:00'
     }
   },
   onLoad (option) {
     this.status = option.status
     if (this.deviceInfoItems.status === '1') {
       this.showButton = false
+    }
+    if (this.yuyueInfor.yy_modelid) {
+      this.isYuyue = true
+      this.timer = setInterval(() => {
+        this.getTimer(this.yuyueInfor.yy_overtime, this.yuyueInfor.yy_status)
+      }, 1000)
+      this.getTimer(this.yuyueInfor.yy_overtime, this.yuyueInfor.yy_status)
     }
     uni.setNavigationBarTitle({
     　title: option.title
@@ -217,18 +227,67 @@ export default {
       img_path: '',
       status: null
     })
+    this.setYuyueInfor({
+      yy_modelid: null,
+      yy_modelname: "",
+      yy_overtime: "",
+      yy_status: ""
+    })
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
   },
   computed: {
-    ...mapState(['userid', 'deviceInfoItems'])
+    ...mapState(['userid', 'deviceInfoItems', 'showCancelPop', 'yuyueInfor'])
   },
   methods: {
-    ...mapMutations(['setDeviceInfoItems']),
+    ...mapMutations(['setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor']),
+    getTimer (overTime, status) {
+      // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
+      const nowTime = new Date().getTime()
+      let overTimes = overTime.substring(0, 19).replace(/-/g,'/');
+          overTimes = new Date(overTimes).getTime();
+
+      let xcTimestamp
+      if (status === '0') {
+        xcTimestamp = overTimes - nowTime
+      } else {
+        xcTimestamp = nowTime - overTimes
+      }
+      // console.log(nowTime, overTimes, xcTimestamp)
+
+      // xcTimestamp <= 0 表示预约时间到了
+      if (xcTimestamp <= 0 && status === '0') {
+        console.log('已经过了时间。')
+        this.$CommonJs.showToast('时间到！')
+        // this.isYuyue = false
+        this.syTime = '00:00:00'
+        if (this.timer) {
+          clearInterval(this.timer)
+        }
+      } else {
+        let day = Number.parseInt(xcTimestamp / ( 24 * 60 * 60 * 1000 ))
+        let hour = Number.parseInt(xcTimestamp / ( 60 * 60 * 1000 ) % 24)
+            hour < 10 ? hour = '0' + hour : hour
+        let minute = Math.floor(xcTimestamp / ( 60 * 1000 ) % 60)
+            minute < 10 ? minute = '0' + minute : minute
+        let second = Math.floor(xcTimestamp / ( 1000 ) % 60)
+            second < 10 ? second = '0' + second : second
+            // console.log(day, hour, minute, second)
+        if (day > 0) {
+          this.syTime = `${day}:${hour}:${minute}:${second}`
+          return
+        }
+        this.syTime = `${hour}:${minute}:${second}`
+      }
+    },
     yuyueFn () {
       this.showPop = true
-      const date = new Date();
+      const nowData = new Date().getTime() + 10 * 60 * 1000
+      const date = new Date(nowData);
       let hour = date.getHours();
       let minute = Number.parseInt(date.getMinutes() / 10);
-      console.log(hour, minute)
+      // console.log(nowData, date, hour, minute)
       let multiIndex = [hour, minute]
       this.multiIndex = multiIndex
     },
@@ -320,7 +379,10 @@ export default {
 				data,
 				(data) => {
           this.$CommonJs.showToast('操作成功！')
-          this.setDeviceInfoItems({ status: '1' })
+          setTimeout(()=>{
+            uni.navigateBack({})
+          }, 1000)
+          // this.setDeviceInfoItems({ status: '1' })
 				}
 			)
     }
@@ -376,8 +438,9 @@ export default {
   }
   h1 {
     color: #fff;
-    font-size: 50px;
+    font-size: 88upx;
     line-height: 70px;
+    font-weight: 600;
     letter-spacing: 8px;
   }
 }
