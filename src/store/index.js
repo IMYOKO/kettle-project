@@ -8,6 +8,7 @@ const state = {
   showOtaPop: false,
   showCodePop: false,
   showCancelPop: false,
+  showStopWorke: false,
   userid: uni.getStorageSync('userid') || '', // 用户id
   username: uni.getStorageSync('username') || '', // 用户账号
   nickname: uni.getStorageSync('nickname') || '', // 昵称
@@ -52,6 +53,9 @@ const mutations = {
   },
   setCancelPopType (state, value) {
     state.showCancelPop = value
+  },
+  setStopWorkeType (state, value) {
+    state.showStopWorke = value
   },
   setMobile (state, mobile) {
     state.mobile = mobile

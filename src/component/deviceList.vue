@@ -3,9 +3,12 @@
     <ul class="device-list" v-if="deviceItem.length > 0">
       <li v-for="(item, index) in deviceItem" :key='index'>
         <view class="device-item" @click="goDeviceInfor(item)" @longpress='showFx(item)'>
-          <view class="normal" v-if="item.status === '0'"></view>
+          <!-- <view class="normal" v-if="item.status === '0'"></view>
           <view class="worker" v-if="item.status === '1'"></view>
-          <view class="out-line" v-if="item.status === '2'"></view>
+          <view class="out-line" v-if="item.status === '2'"></view> -->
+          <view class="worker-type status-0" v-if="item.status === '0'">空闲</view>
+          <view class="worker-type status-1" v-if="item.status === '1' || item.status === '3' || item.status === '4'">工作中</view>
+          <view class="worker-type status-2" v-if="item.status === '2'">离线</view>
           <view class="img-box">
             <image :src='item.devicelogo' :class="{'outline': item.status === '2'}" />
           </view>
@@ -48,7 +51,7 @@ export default {
         devicemac: '',
         devicename: '',
         devicelogo: '',
-        status: null, // 设备状态 0空闲  1工作中  2离线”
+        status: null, // 设备状态  0空闲  1工作中  2离线 3保温中 4保温暂停
         is_zhu: null, // 是否是主用户  0否  1是   主用户可以删除子用户、分享给用户、编辑设备。为0则无权限
       }
     }
@@ -59,20 +62,15 @@ export default {
   methods: {
     ...mapMutations(['setShareType']),
     goDeviceInfor (item) {
-      this.$CommonJs.pathTo('/device/deviceItem?deviceid=' + item.deviceid + '&title=' + item.devicename + '&status=' + item.status)
+      this.$CommonJs.pathTo('/device/deviceItem?deviceid=' + item.deviceid + '&title=' + item.devicename)
     },
     addDevice () {
       this.$CommonJs.pathTo('/device/add')
     },
     showFx (item) {
-      // this.setShareType(true)
-      // this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
-      if (item.is_zhu === '1') {
-        this.setShareType(true)
-        this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
-      } else {
-        this.$CommonJs.showToast('无权限操作！')
-      }
+      this.setShareType(true)
+      this.deviceItemItem = Object.assign({}, this.deviceItemItem, item)
+      console.log(this.deviceItemItem)
     }
   },
   components: {
@@ -130,6 +128,24 @@ export default {
         padding: 15px 5px;
         position: relative;
         overflow: hidden;
+
+        .worker-type {
+          position: absolute;
+          right: 10px;
+          top: 5px;
+          z-index: 10;
+          font-size: 10px;
+
+          &.status-0 {
+            color: rgb(1, 216, 48);
+          }
+          &.status-1 {
+            color: rgb(231, 10, 10);
+          }
+          &.status-2 {
+            color: rgb(196, 196, 196);
+          }
+        }
 
         .worker,
         .normal,

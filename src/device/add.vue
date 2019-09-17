@@ -48,6 +48,21 @@ export default {
   computed: {
     ...mapState(['userid'])
   },
+  onLoad () {
+    uni.showModal({
+      content: "请确认设备配网完成，并已连接上网络！",
+      confirmText: "下一步",
+      cancelText: "取消",
+      success: (res) => {
+        if (res.confirm) {
+          console.log('用户点击下一步');
+        } else if (res.cancel) {
+          console.log('用户点击取消');
+          uni.navigateBack({})
+        }
+      }
+    })
+  },
   onUnload () {
     if (this.timer) {
       clearInterval(this.timer)

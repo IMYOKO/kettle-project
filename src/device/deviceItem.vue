@@ -2,13 +2,33 @@
   <view class="device">
     <!-- 预约时间 start -->
     <view class="has-yuyue" v-if="yy_modelid">
-      <h3>已预约</h3>
-      <h4>{{yy_overtime}} {{yy_status === '0' ? '进行' : yy_status === '1' ? '完成' : ''}}烹饪</h4>
+      <view @click="goYuyueDevicepage(yy_modelid)">
+        <h3>已预约</h3>
+        <h4>{{yy_overtime}} {{yy_status === '0' ? '进行' : yy_status === '1' ? '完成' : ''}}烹饪</h4>
+      </view>
       <button @click="setCancelPopType(true)">取消</button>
 
       <CancelPop v-if="showCancelPop" where='deviceItem' :modelid='yy_modelid' :deviceid='deviceid' @queryDeviceInfo='queryDeviceInfo' @cancelCallback='cancelCallback' />
     </view>
     <!-- 预约时间 end -->
+
+    <!-- 工作中 start -->
+    <view class="has-yuyue" v-if="device_status === 1 || device_status === 3 || device_status === 4">
+    <!-- <view class="has-yuyue"> -->
+      <view @click="goStop">
+        <h3 v-if="device_status === 1">工作中</h3>
+        <h3 v-if="device_status === 3 || device_status === 4">保温中</h3>
+
+        <h4 v-if="device_status === 1">{{over_time}} 分钟完成</h4>
+        <h4 v-if="device_status === 3">{{wendu}} | {{over_time}}分钟</h4>
+        <h4 v-if="ddevice_status === 4">暂停中</h4>
+      </view>
+      <button @click="setStopWorkeType(true)">停止</button>
+
+      <StopWorke v-if="showStopWorke" where='deviceItem' :deviceid='deviceid' :device_status="device_status"  @queryDeviceInfo='queryDeviceInfo' @cancelCallback='cancelCallback' />
+    </view>
+    <!-- 工作中 end -->
+
     <view class="device-detail">
       <ul class="device-list">
         <li v-for="(item, index) in deviceInfoItem" :key="index" @click="goDevicePage(item)" v-show='index <= 5'>
@@ -67,10 +87,10 @@ import { mapState, mapMutations } from 'vuex'
 import Code from '../component/code'
 import Ota from '../component/ota'
 import CancelPop from '../component/cancel'
+import StopWorke from '../component/stopWorke'
 export default {
   data () {
     return {
-      status: null,
       deviceInfoItem: [],
       kf_mobile: '',
       kf_img: '',
@@ -78,6 +98,9 @@ export default {
       ota_name: '',
       ota_version: '',
       ota_time: '',
+      wendu: null,
+      over_time: '',
+      device_status: -1, // 设备状态  0空闲  1工作中  2离线 3保温中 4保温暂停
       deviceid: null,
       yy_modelid: null,
       yy_modelname: "",
@@ -87,11 +110,10 @@ export default {
   },
   onLoad(option) {
     this.deviceid = option.deviceid
-    this.status = option.status
     uni.setNavigationBarTitle({
     　title: option.title
     })
-    this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
+    // this.queryDeviceInfo({userid: this.userid, deviceid: option.deviceid})
   },
   onShow() {
     if (this.deviceid) {
@@ -99,10 +121,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop'])
+    ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop', 'showStopWorke'])
   },
   methods: {
-    ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor']),
+    ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor', 'setStopWorkeType']),
     async queryDeviceInfo (prams) {
       const data = await this.$server.queryDeviceInfo(prams)
       this.$server.resultCallback(
@@ -119,6 +141,9 @@ export default {
           this.yy_modelname = data.yy_modelname
           this.yy_overtime = data.yy_overtime
           this.yy_status = data.yy_status
+          this.wendu = data.wendu
+          this.over_time = data.over_time
+          this.device_status = data.device_status
           if (this.yy_modelid) {
             this.setYuyueInfor({
               yy_modelid: data.yy_modelid,
@@ -130,9 +155,29 @@ export default {
 				}
 			)
     },
+    goStop () {
+      this.$CommonJs.pathTo('/device/stop?status=' + this.device_status + '&deviceid=' + this.deviceid + '&wendu=' + this.wendu + '&over_time=' + this.over_time)
+    },
+    goYuyueDevicepage (modelid) {
+      let item
+      this.deviceInfoItem.map(value => {
+        if (modelid === value.modelid) {
+          item = value
+        }
+      })
+      this.goDevicePage(item)
+    },
     goDevicePage (item) {
       if (this.yy_modelid && this.yy_modelid !== item.modelid) {
         this.$CommonJs.showToast('当前设备已有预约！')
+        return
+      }
+      if (this.device_status === 1 || this.device_status === 3 || this.device_status === 4) {
+        this.$CommonJs.showToast('当前设备工作中！')
+        return
+      }
+      if (this.device_status === 2) {
+        this.$CommonJs.showToast('当前设备已离线！')
         return
       }
       this.$CommonJs.pathTo('/device/deviceInfor?modelid=' + item.modelid + '&title=' + item.modelname)
@@ -141,7 +186,7 @@ export default {
         modelid: item.modelid,
         peifang: item.peifang,
         img_path: item.img_path,
-        status: this.deviceInfoItems.status === null ? this.status : this.deviceInfoItems.status
+        status: this.device_status
       }
       this.setDeviceInfoItems(payload)
     },
@@ -166,7 +211,8 @@ export default {
   components: {
     Code,
     Ota,
-    CancelPop
+    CancelPop,
+    StopWorke
   }
 }
 </script>

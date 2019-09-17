@@ -22,6 +22,7 @@
 				{ "path": "add", "style": { "navigationBarTitleText": "新增设备" } },
 				{ "path": "deviceItem", "style": { "navigationBarTitleText": "" } },
 				{ "path": "deviceInfor", "style": { "navigationBarTitleText": "" } },
+				{ "path": "stop", "style": { "navigationBarTitleText": "" } },
 				{ "path": "band", "style": { "navigationBarTitleText": "" } },
 				{ "path": "subscribe", "style": { "navigationBarTitleText": "我的预约" } }
 			]

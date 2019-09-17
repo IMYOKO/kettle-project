@@ -49,12 +49,12 @@
         <view class="button" v-if="showButton">
           <view class="button-wrapper">
             <text @click="yuyueFn">预约</text>
-            <text @click="saveJobTime(1)">确定</text>
+            <text @click="kaishi">开始</text>
           </view>
         </view>
         <view class="button" v-else>
-          <view class="button-wrapper">
-            <text>设备工作中...</text>
+          <view class="button-wrapper" @click="overDeviceYy">
+            <text>停止工作</text>
           </view>
         </view>
       </view>
@@ -242,6 +242,22 @@ export default {
   },
   methods: {
     ...mapMutations(['setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor']),
+    async overDeviceYy () {
+      const prams = {
+        userid: this.userid,
+        deviceid: this.deviceInfoItems.deviceid,
+        modelid: 0
+      }
+      const data = await this.$server.overDeviceYy(prams)
+      this.$server.resultCallback(
+				data,
+				(data) => {
+          this.$CommonJs.showToast('操作成功！')
+          this.setCancelPopType(false)
+          uni.navigateBack({})
+				}
+			)
+    },
     getTimer (overTime, status) {
       // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
       const nowTime = new Date().getTime()
@@ -385,7 +401,22 @@ export default {
           // this.setDeviceInfoItems({ status: '1' })
 				}
 			)
-    }
+    },
+    kaishi () {
+      uni.showModal({
+        content: "请注意使用环境安全，避免不安全因素，再开始！",
+        confirmText: "确定",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            this.saveJobTime(1)
+            console.log('用户点击确定');
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+        }
+      })
+		}
   },
   components: {
     CancelPop
