@@ -30,11 +30,11 @@
         </view>
         <ul class="time-wrapper">
           <li>
-            <view class="time">保温时长 <text class="span">{{shichang}}小时</text><text class="em"></text></view>
-            <slider class="slider-wen" :value="shichang" @change="sliderChangeSC" min="0" max="12" />
+            <view class="time">保温时长 <text class="span">{{shichang}}分钟</text><text class="em"></text></view>
+            <slider class="slider-wen" :value="shichang" @change="sliderChangeSC" min="0" max="120" />
             <view class="text">
-              <text>0小时</text>
-              <text>12小时</text>
+              <text>0分钟</text>
+              <text>120分钟</text>
             </view>
           </li>
           <li>
