@@ -38,10 +38,14 @@ const state = {
     yy_modelname: "",
     yy_overtime: "",
     yy_status: ""
-  }
+  },
+  upDateFn: null
 }
 
 const mutations = {
+  setUpDateFn (state, data) {
+    state.upDateFn = data
+  },
   setShareType (state, value) {
     state.shareType = value
   },

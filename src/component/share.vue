@@ -25,7 +25,7 @@
               <view class="image">
                 <image src='../static/image/del.png' />
               </view>
-              <view class="title">删除</view>
+              <view class="title">删除{{where}}</view>
             </view>
           </li>
           <li v-if="deviceItemItem.is_zhu==='1'">
@@ -95,6 +95,7 @@
 import { mapMutations, mapState } from 'vuex';
 export default {
   props: {
+    where: String,
     deviceItemItem: Object,
     closeShareType: Function
   },
@@ -112,17 +113,20 @@ export default {
     if (this.timer) clearTimeout(this.timer)
   },
   computed: {
-    ...mapState(['userid'])
+    ...mapState(['userid', 'upDateFn'])
   },
   methods: {
     ...mapMutations(['setShareType']),
     showType (type) {
       this.active = type
     },
-    cancel () {
+    cancel (type) {
       this.active = 0
       this.deviceName = ''
       this.mobile = ''
+      if (type) {
+        this.upDateFn()
+      }
       this.setShareType(false)
     },
     close () {
@@ -169,7 +173,7 @@ export default {
 				(data) => {
           this.$CommonJs.showToast('操作成功！')
           this.timer = setTimeout(() => {
-            this.cancel()
+            this.cancel(true)
           }, 1000)
 				}
 			)
@@ -202,7 +206,7 @@ export default {
 				(data) => {
           this.$CommonJs.showToast('操作成功！')
           this.timer = setTimeout(() => {
-            this.cancel()
+            this.cancel(true)
           }, 1000)
 				}
 			)

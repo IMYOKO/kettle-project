@@ -187,8 +187,8 @@ export default {
       startDate: getDate('start'),
       endDate: getDate('end'),
       time: '06:00',
-      shichang: 0,
-      wendu: 0,
+      shichang: 60,
+      wendu: 80,
       timeArray: ['10分钟', '20分钟', '30分钟', '40分钟', '50分钟', '60分钟', '70分钟', '80分钟', '90分钟', '100分钟', '110分钟', '120分钟'],
       timeIndex: 0,
       multiArray: [
@@ -204,6 +204,8 @@ export default {
     }
   },
   onLoad (option) {
+    console.log('页面参数=====>', option)
+    console.log('预约参数=====>', this.yuyueInfor)
     this.status = option.status
     if (this.deviceInfoItems.status === '1') {
       this.showButton = false

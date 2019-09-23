@@ -32,7 +32,7 @@
     </view>
 
     <!-- 分享 start -->
-    <Share v-if="shareType" :deviceItemItem='deviceItemItem' />
+    <Share v-if="shareType" :where='where' :deviceItemItem='deviceItemItem' />
     <!-- 分享 end -->
   </view>
 </template>
@@ -42,6 +42,7 @@ import {mapState, mapMutations} from 'vuex'
 import Share from './share'
 export default {
   props: {
+    where: String,
     deviceItem: Array
   },
   data () {

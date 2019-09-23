@@ -25,6 +25,7 @@ class Api extends BasicApi {
   /**
    * 我的设备
    * @param {Number} userid 
+   * @param {Number} deviceid 
    */
   queryDeviceInfo (data) {
     return this.post('/api/queryDeviceInfo.htm', data, {})

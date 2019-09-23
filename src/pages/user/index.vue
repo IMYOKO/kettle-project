@@ -16,6 +16,10 @@
     </view>
     <!-- 绑定手机信息 end -->
 
+    <!-- 扫一扫 -->
+    <view class="saoyisao"></view>
+    <!-- 扫一扫 -->
+
     <!-- 我的设备 start -->
     <ul class="shebei-list">
       <li>

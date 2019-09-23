@@ -20,7 +20,7 @@
         <h3 v-if="device_status === 3 || device_status === 4">保温中</h3>
 
         <h4 v-if="device_status === 1">{{over_time}} 分钟完成</h4>
-        <h4 v-if="device_status === 3">{{wendu}} | {{over_time}}分钟</h4>
+        <h4 v-if="device_status === 3">{{wendu}} ℃ | {{over_time}}分钟</h4>
         <h4 v-if="ddevice_status === 4">暂停中</h4>
       </view>
       <button @click="setStopWorkeType(true)">停止</button>
@@ -117,6 +117,7 @@ export default {
   },
   onShow() {
     if (this.deviceid) {
+      console.log('=====> 模式列表页刷新')
       this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
     }
   },
@@ -126,10 +127,16 @@ export default {
   methods: {
     ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor', 'setStopWorkeType']),
     async queryDeviceInfo (prams) {
+      uni.showLoading({
+        title: '请求中...'
+      });
       const data = await this.$server.queryDeviceInfo(prams)
+      uni.hideLoading();
       this.$server.resultCallback(
 				data,
 				(data) => {
+          console.log('=====> 模式列表数据请求成功！')
+					console.log(data)
 					this.deviceInfoItem = data.deviceInfoItem
 					this.kf_img = data.kf_img
 					this.kf_mobile = data.kf_mobile
@@ -145,12 +152,14 @@ export default {
           this.over_time = data.over_time
           this.device_status = data.device_status
           if (this.yy_modelid) {
-            this.setYuyueInfor({
+            const yuyueData = {
               yy_modelid: data.yy_modelid,
               yy_modelname: data.yy_modelname,
               yy_overtime: data.yy_overtime,
               yy_status: data.yy_status
-            })
+            }
+            this.setYuyueInfor(yuyueData)
+            console.log('===> 预约数据', yuyueData)
           }
 				}
 			)

@@ -50,7 +50,7 @@ export default {
   },
   onLoad () {
     uni.showModal({
-      content: "请确认设备配网完成，并已连接上网络！",
+      content: "请确认设备配网完成，并确保手机与设备是连接到同一路由器！",
       confirmText: "下一步",
       cancelText: "取消",
       success: (res) => {
@@ -104,6 +104,7 @@ export default {
       uni.showLoading({
         title: '扫描中，请等待...'
       });
+      this.deviceList = []
       this.timer = setInterval(() => {
         this.count ++ 
         if (this.count >= 30) {

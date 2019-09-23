@@ -23,17 +23,11 @@
 			</li>
 		</ul>
 
-		<!-- <button
-			v-if="isdevelopment"
-			open-type="getUserInfo"
-			@getuserinfo="getuserinfo"
-		>获取信息</button> -->
-
 		<view class="shebei-wrapper">
 			<view class="title">我的设备</view>
 			<!-- 未绑定 -->
 			<view class="my-shebei" style="margin-top: 10px">
-				<DeviceList :deviceItem='deviceItem' />
+				<DeviceList :deviceItem='deviceItem' where='home' />
 			</view>
 		</view>
 
@@ -61,7 +55,6 @@ export default {
 	data() {
 		return {
 			weixinCode: '',
-			isdevelopment: false,
 			indicatorDots: true,
 			autoplay: true,
 			interval: 3000,
@@ -73,85 +66,18 @@ export default {
 		}
 	},
 	onShow() {
-		if (process.env.NODE_ENV === 'development') {
-			this.isdevelopment = true
-		}
+		console.log('=====> 首页页面刷新！')
+		this.setUpDateFn(this.wexinlogin)
 		this.wexinlogin()
 	},
+	onHide() {
+    this.setUpDateFn(null)
+  },
 	computed: {
 		...mapState(['openid'])
 	},
 	methods: {
-		...mapMutations(['setUserInfor', 'setNewsItems']),
-		getuserinfo(e) {
-			console.log(e)
-		},
-		lanya () {
-			function ab2hex(buffer) {
-				const hexArr = Array.prototype.map.call(
-					new Uint8Array(buffer),
-					function (bit) {
-						return ('00' + bit.toString(16)).slice(-2)
-					}
-				)
-				return hexArr.join('')
-			}
-			uni.openBluetoothAdapter({
-				success: (res) => {
-					console.log('初始化蓝牙成功！')
-					this.$CommonJs.showToast('初始化蓝牙成功！')
-					uni.startBluetoothDevicesDiscovery({
-						allowDuplicatesKey: false,
-						interval: 0,
-						success: (res) => {
-							console.log('开始搜索蓝牙！')
-							uni.showLoading({
-								title: '开始搜索蓝牙！'
-							});
-							uni.getBluetoothDevices({
-								success: (res) => {
-									console.log('蓝牙: ', res.devices)
-									// uni.hideLoading()
-									// const list = res.devices
-									// this.devices = list
-									uni.onBluetoothDeviceFound((devices) => {
-										console.log('new device list has founded')
-										console.log(devices)
-										console.log(devices.devices[0])
-										const devicesList = this.devices.slice(0)
-										let hasDevices = false
-										devicesList.map(item => {
-											if (item.deviceId === devices.devices[0].deviceId) {
-												hasDevices = true
-											}
-										})
-										if (!hasDevices) {
-											this.devices.push(devices.devices[0])
-										}
-										if (devices.devices[0].name === 'YOKO') {
-											uni.hideLoading()
-											this.$CommonJs.showToast('找到yoko, 停止搜索')
-											uni.stopBluetoothDevicesDiscovery({
-												success: (res) => {
-													console.log('停止搜索蓝牙！')
-												}
-											})
-										}
-									})
-								}
-							})
-							console.log(res)
-						},
-						fail (err) {
-							console.log(err)
-						}
-					})
-				},
-				fail (err) {
-					console.log(err)
-				}
-			})
-		},
+		...mapMutations(['setUserInfor', 'setNewsItems', 'setUpDateFn']),
 		goWebView (url) {
 			this.$CommonJs.pathTo('/infor/webView?url=' + url)
 		},
@@ -164,15 +90,21 @@ export default {
 				provider: 'weixin',
 				success: (loginRes) => {
 					this.weixinCode = loginRes.code
-					this.login(loginRes.code)
+					this.login()
 				}
 			})
 		},
-		async login (code) {
-			const data = await this.$server.login({code})
+		async login () {
+			uni.showLoading({
+        title: '请求中...'
+      });
+			const data = await this.$server.login({code: this.weixinCode})
+			uni.hideLoading();
 			this.$server.resultCallback(
 				data,
 				(data) => {
+					console.log('=====> 首页数据请求成功！')
+					console.log(data)
 					this.deviceItem = data.deviceItem
 					this.bannerItem = data.bannerItem
 					this.newsItem = data.newsItem

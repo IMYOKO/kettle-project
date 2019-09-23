@@ -3,7 +3,7 @@
     <view class="has-devices">
       <view class="top-box">
         <h3>{{status === 1 ? '停止工作？' : status === 3 || status === 4 ? '停止保温？' : ''}}</h3>
-        <h5>{{wudu}}</h5>
+        <h5>{{wudu}} ℃</h5>
         <h5 class="mt-180"></h5>
         <h1>{{over_time}} 分钟</h1>
       </view>
@@ -30,11 +30,11 @@ export default {
       deviceid: null,
       over_time: '',
       wudu: null,
-      timer: null,
-      syTime: '00:00:00'
+      timer: null
     }
   },
   onLoad (option) {
+    console.log(option)
     this.status = option.status
     this.deviceid = option.deviceid
     this.over_time = option.over_time
