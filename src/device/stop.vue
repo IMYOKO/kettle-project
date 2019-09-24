@@ -2,10 +2,12 @@
   <view class="devices">
     <view class="has-devices">
       <view class="top-box">
-        <h3>{{status === 1 ? '停止工作？' : status === 3 || status === 4 ? '停止保温？' : ''}}</h3>
-        <h5>{{wudu}} ℃</h5>
-        <h5 class="mt-180"></h5>
-        <h1>{{over_time}} 分钟</h1>
+        <h3>{{wendu}}</h3>
+        <!-- <h3>{{status === '1' ? '停止工作？' : status === '3' || status === '4' ? '停止保温？' : ''}}</h3> -->
+        <!-- <h5>{{wendu}}</h5> -->
+        <h5> </h5>
+        <h5 class="mt-180">剩余</h5>
+        <h1>{{over_time}}分钟</h1>
       </view>
       <view class="bottom-box">
         <view class="quxiao">
@@ -29,7 +31,7 @@ export default {
       status: -1,
       deviceid: null,
       over_time: '',
-      wudu: null,
+      wendu: null,
       timer: null
     }
   },
@@ -38,7 +40,7 @@ export default {
     this.status = option.status
     this.deviceid = option.deviceid
     this.over_time = option.over_time
-    this.wudu = option.wudu
+    this.wendu = option.wendu
   },
   onUnload () {
     if (this.timer) {

@@ -62,12 +62,17 @@ export default {
 			deviceItem: [],
 			bannerItem: [],
 			newsItem: [],
-			devices: []
+			devices: [],
+			isPullDownRefresh: false
 		}
 	},
 	onShow() {
 		console.log('=====> 首页页面刷新！')
 		this.setUpDateFn(this.wexinlogin)
+		this.wexinlogin()
+	},
+	onPullDownRefresh() {
+		this.isPullDownRefresh = true
 		this.wexinlogin()
 	},
 	onHide() {
@@ -91,6 +96,12 @@ export default {
 				success: (loginRes) => {
 					this.weixinCode = loginRes.code
 					this.login()
+				},
+				fail: () => {
+					if (this.isPullDownRefresh) {
+						uni.stopPullDownRefresh()
+						this.isPullDownRefresh = false
+					}
 				}
 			})
 		},
@@ -100,6 +111,10 @@ export default {
       });
 			const data = await this.$server.login({code: this.weixinCode})
 			uni.hideLoading();
+			if (this.isPullDownRefresh) {
+        uni.stopPullDownRefresh()
+        this.isPullDownRefresh = false
+      }
 			this.$server.resultCallback(
 				data,
 				(data) => {

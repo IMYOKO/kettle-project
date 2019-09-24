@@ -20,7 +20,7 @@
         <h3 v-if="device_status === 3 || device_status === 4">保温中</h3>
 
         <h4 v-if="device_status === 1">{{over_time}} 分钟完成</h4>
-        <h4 v-if="device_status === 3">{{wendu}} ℃ | {{over_time}}分钟</h4>
+        <h4 v-if="device_status === 3">{{wendu}} | {{over_time}}分钟</h4>
         <h4 v-if="ddevice_status === 4">暂停中</h4>
       </view>
       <button @click="setStopWorkeType(true)">停止</button>
@@ -105,7 +105,8 @@ export default {
       yy_modelid: null,
       yy_modelname: "",
       yy_overtime: "",
-      yy_status: "" // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
+      yy_status: "", // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
+      isPullDownRefresh: false
     }
   },
   onLoad(option) {
@@ -121,6 +122,13 @@ export default {
       this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
     }
   },
+  onPullDownRefresh() {
+    this.isPullDownRefresh = true
+    this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
+  },
+  onHide() {
+    clearTimeout(this.timer)
+  },
   computed: {
     ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop', 'showStopWorke'])
   },
@@ -132,6 +140,10 @@ export default {
       });
       const data = await this.$server.queryDeviceInfo(prams)
       uni.hideLoading();
+      if (this.isPullDownRefresh) {
+        uni.stopPullDownRefresh()
+        this.isPullDownRefresh = false
+      }
       this.$server.resultCallback(
 				data,
 				(data) => {

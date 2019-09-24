@@ -31,6 +31,8 @@
         </li>
       </ul>
     </view>
+
+    <view class="d-bg" v-if="isStartLocalServiceDiscovery"></view>
   </view>
 </template>
 
@@ -42,7 +44,8 @@ export default {
       mac: '',
       deviceList: [],
       timer: null,
-      count: 0
+      count: 0,
+      isStartLocalServiceDiscovery: false
     }
   },
   computed: {
@@ -101,21 +104,34 @@ export default {
     // mDns 
     startLocalServiceDiscovery () {
       //#ifdef MP-WEIXIN
+      if (this.isStartLocalServiceDiscovery) {
+        uni.showLoading({
+          title: '扫描中，请等待...'
+        });
+        return
+      }
       uni.showLoading({
         title: '扫描中，请等待...'
       });
+      this.isStartLocalServiceDiscovery = true
       this.deviceList = []
+      clearInterval(this.timer)
+      console.log('列表清除： ', this.deviceList)
       this.timer = setInterval(() => {
         this.count ++ 
-        if (this.count >= 30) {
+        if (this.count >= 10) {
           clearInterval(this.timer)
+          this.count = 0
+          this.isStartLocalServiceDiscovery = false
           uni.hideLoading();
           wx.stopLocalServiceDiscovery({
             success: () => {
               console.log('停止 dns 扫描成功。')
+              console.log('停止 dns 扫描成功： ', this.deviceList)
             },
             fail: () => {
               console.log('停止 dns 扫描失败。')
+              console.log('停止 dns 扫描成功： ', this.deviceList)
             }
           })
         }
@@ -128,9 +144,17 @@ export default {
           console.log('startLocalServiceDiscovery success')
           wx.onLocalServiceFound((res)=> {
             console.log('mDNS 服务发现的事件的回调: ', res)
-            uni.hideLoading()
+            // uni.hideLoading()
             if (res.serviceName && res.serviceName.length === 12) {
-              this.deviceList.push(res)
+              let hasService = false
+              this.deviceList.map(item => {
+                if (item.serviceName == res.serviceName) {
+                  hasService = true
+                }
+              })
+              if (!hasService) {
+                this.deviceList.push(res)
+              }
               console.log('deviceList: ', this.deviceList)
             }
           })
@@ -138,7 +162,7 @@ export default {
         fail: () => {
           this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
           console.log('startLocalServiceDiscovery失败: ')
-          uni.hideLoading();
+          // uni.hideLoading();
         }
       })
       //#endif
@@ -150,6 +174,16 @@ export default {
 <style lang="less" scoped>
 .add-device {
   padding: 20px 20px;
+
+  .d-bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background: rgba(0, 0, 0, .2);
+  }
 
   .button-wrapper {
     padding-top: 30%;

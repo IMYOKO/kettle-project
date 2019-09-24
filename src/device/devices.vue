@@ -15,7 +15,8 @@ export default {
     return {
       img_path: '',
       img_url: '',
-      deviceItem: []
+      deviceItem: [],
+      isPullDownRefresh: false
     }
   },
   onShow() {
@@ -23,6 +24,10 @@ export default {
     this.setUpDateFn(this.queryDevice)
     this.queryDevice()
   },
+  onPullDownRefresh() {
+    this.isPullDownRefresh =  true
+    this.queryDevice()
+	},
   onHide() {
     this.setUpDateFn(null)
   },
@@ -42,6 +47,10 @@ export default {
       });
       const data = await this.$server.queryDevice({userid: this.userid})
       uni.hideLoading();
+      if (this.isPullDownRefresh) {
+        uni.stopPullDownRefresh()
+        this.isPullDownRefresh = false
+      }
       this.$server.resultCallback(
         data,
         (data) => {
