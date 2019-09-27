@@ -1,7 +1,6 @@
 // 开发环境接口
 let BasicUrl = ''
 if (process.env.NODE_ENV === 'development') {
-  // BasicUrl = 'http://zb.haopengit.com'
   BasicUrl = 'https://jibuyn.haopengit.com'
 } else {
   BasicUrl = 'https://jibuyn.haopengit.com'
