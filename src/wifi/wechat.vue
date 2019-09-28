@@ -1,22 +1,12 @@
 <template>
   <view class="Wifi">
     <view class="tips-wrapper">
-      <h3 class="title">配置设备上网前请确认已完成以下准备：</h3>
+      <h3 class="title">微信公众号配网说明：</h3>
       <ul class="zhunbei-list">
-        <li>1：手机连接WIFI, 不支持5G WIFI和隐藏的WIFI</li>
-        <li>2：打开机器，同时长按“功能”“时间”按键</li>
-        <li>3：按下一步，配置设备上网</li>
+        <li>1：关注并进入公众号”小诺智能电器” </li>
+        <li>2：选择WIFI 配网</li>
+        <li>3：打开机器，设置机器进入微信公众号配网模式</li>
       </ul>
-    </view>
-
-    <view class="wifi-button">
-      <view class="button" @click="goWifi">配置设备上网</view>
-    </view>
-    <view class="wifi-button">
-      <view class="button" @click="goWechat">微信公众号配网</view>
-    </view>
-    <view class="wifi-button">
-      <view class="is-connect" @click="goAdd">设备已联网，跳过此步</view>
     </view>
   </view>
 </template>
@@ -26,17 +16,7 @@ export default {
   data () {
     return {}
   },
-  methods: {
-    goAdd() {
-      this.$CommonJs.pathTo('/device/add')
-    },
-    goWifi() {
-      this.$CommonJs.pathTo('/wifi/index')
-    },
-    goWechat() {
-      this.$CommonJs.pathTo('/wifi/wechat')
-    }
-  }
+  methods: {}
 }
 </script>
 

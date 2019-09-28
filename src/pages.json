@@ -6,6 +6,13 @@
 	],
 	"subPackages": [
 		{
+			"root": "wifi",
+			"pages": [
+				{ "path": "index", "style": { "navigationBarTitleText": "配置设备上网" } },
+				{ "path": "wechat", "style": { "navigationBarTitleText": "微信公众号配网" } }
+			]
+		},
+		{
 			"root": "infor",
 			"pages": [
 				{ "path": "webView", "style": { "navigationBarTitleText": "" } },

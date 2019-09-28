@@ -24,10 +24,12 @@
 
     <view class="device">
       <h3>已发现设备</h3>
-      <ul class="device-list" v-if="deviceList.length > 0">
+      <ul class="device-list" v-if="deviceList.length >= 0">
+        <li @click="connectDevice()">
+          <text>'sdsdsdsd'</text>
+        </li>
         <li v-for="(item, index) in deviceList" :key="index" @click="connectDevice(item.serviceName)">
           <text>{{item.serviceName}}</text>
-          <!-- <text>未连接</text> -->
         </li>
       </ul>
     </view>
@@ -88,7 +90,11 @@ export default {
         this.$CommonJs.showToast('请输入设备码！')
         return false
       }
+      uni.showLoading({
+        title: '设备添加中，请等待...'
+      });
       const data = await this.$server.addDevice({userid: this.userid, mac: this.mac})
+      uni.hideLoading();
       this.$server.resultCallback(data,
 			(data) => {
         this.$CommonJs.showToast('添加成功！')
@@ -98,8 +104,19 @@ export default {
 			})
     },
     connectDevice (mac) {
-      this.mac = mac
-      this.sumbit()
+      uni.showModal({
+        content: "确认添加此设备？",
+        confirmText: "确认",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            this.mac = mac
+             this.sumbit()
+          } else if (res.cancel) {
+            console.log('用户点击取消');
+          }
+        }
+      })
     },
     // mDns 
     startLocalServiceDiscovery () {
@@ -144,7 +161,6 @@ export default {
           console.log('startLocalServiceDiscovery success')
           wx.onLocalServiceFound((res)=> {
             console.log('mDNS 服务发现的事件的回调: ', res)
-            // uni.hideLoading()
             if (res.serviceName && res.serviceName.length === 12) {
               let hasService = false
               this.deviceList.map(item => {
@@ -162,7 +178,6 @@ export default {
         fail: () => {
           this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
           console.log('startLocalServiceDiscovery失败: ')
-          // uni.hideLoading();
         }
       })
       //#endif
