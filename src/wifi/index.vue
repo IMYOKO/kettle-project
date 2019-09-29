@@ -80,7 +80,9 @@ export default {
       step_02_status: null,
       step_03_status: null,
       step_04_status: null,
-      timer: null
+      timer: null,
+      LocalServiceDiscoveryTimer: null,
+      count: 0
     }
   },
   onShow() {
@@ -104,10 +106,10 @@ export default {
     this.startWifi = false
     this.startLSD = false
     this.udpSocket = null
-    this.step_01_status = false
-    this.step_02_status = false
-    this.step_03_status = false
-    this.step_04_status = false
+    this.step_01_status = null
+    this.step_02_status = null
+    this.step_03_status = null
+    this.step_04_status = null
     //#ifdef MP-WEIXIN
     if (this.startWifi) {
       wx.stopWifi({
@@ -131,6 +133,9 @@ export default {
     }
     if (this.timer) {
       clearTimeout(this.timer)
+    }
+    if (this.LocalServiceDiscoveryTimer) {
+      clearTimeout(this.LocalServiceDiscoveryTimer)
     }
     //#endif
   },
@@ -156,7 +161,7 @@ export default {
             console.log('初始化wifi成功！');
             wx.getConnectedWifi({
               success: (WifiInfo) => {
-                // console.log(WifiInfo)
+                console.log(WifiInfo)
                 console.log('检测已连接的wifi成功！');
                 this.wifiSSID = WifiInfo.wifi.SSID
                 this.BSSID = WifiInfo.wifi.BSSID
@@ -179,6 +184,10 @@ export default {
     },
     connectWifi (type) {
       //#ifdef MP-WEIXIN
+      if (this.password == '') {
+        this.$CommonJs.showToast('请输入wifi密码！')
+        return
+      }
       wx.connectWifi({
         SSID: this.wifiSSID,
         BSSID: this.BSSID,
@@ -296,8 +305,19 @@ export default {
         success: () => {
           this.startLSD = true
           console.log('startLocalServiceDiscovery success')
+          this.LocalServiceDiscoveryTimer = setInterval(() => {
+            this.count ++
+            if (this.count >= 10) {
+              clearInterval(this.LocalServiceDiscoveryTimer)
+              this.$CommonJs.showToast('配网超时！')
+              this.step_03_status = false
+              this.goBack()
+              uni.hideLoading();
+            }
+          }, 1000)
           wx.onLocalServiceFound((res)=> {
             console.log('mDNS 服务发现的事件的回调: ', res)
+            clearInterval(this.LocalServiceDiscoveryTimer)
             uni.hideLoading()
             if (res.serviceName && res.serviceName.length === 12) {
               this.$CommonJs.showToast('配网成功！')

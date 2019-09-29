@@ -24,10 +24,7 @@
 
     <view class="device">
       <h3>已发现设备</h3>
-      <ul class="device-list" v-if="deviceList.length >= 0">
-        <li @click="connectDevice()">
-          <text>'sdsdsdsd'</text>
-        </li>
+      <ul class="device-list" v-if="deviceList.length > 0">
         <li v-for="(item, index) in deviceList" :key="index" @click="connectDevice(item.serviceName)">
           <text>{{item.serviceName}}</text>
         </li>
