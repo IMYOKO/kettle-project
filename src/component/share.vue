@@ -25,7 +25,7 @@
               <view class="image">
                 <image src='../static/image/del.png' />
               </view>
-              <view class="title">删除{{where}}</view>
+              <view class="title">删除</view>
             </view>
           </li>
           <li v-if="deviceItemItem.is_zhu==='1'">
@@ -82,7 +82,7 @@
         <h2>子用户列表 <image  @click="cancel" src='../static/image/close.png' /></h2>
         <ul class="zi-user">
           <li v-for="(item, index) in userItem" :key="index">
-            {item.mobile} <text @click="delDeviceUser(item.userid)">删除</text>
+            {{item.mobile}} <text @click="delDeviceUser(item.userid)">删除</text>
           </li>
         </ul>
       </view>
@@ -188,7 +188,7 @@ export default {
       this.$server.resultCallback(
 				data,
 				(data) => {
-          this.userItem = data.data.userItem
+          this.userItem = data.userItem
           this.showType(4)
 				}
 			)

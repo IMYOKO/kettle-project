@@ -66,9 +66,25 @@ export default {
     })
   },
   onUnload () {
+    this.count = 0
+    this.deviceList = []
+    this.isStartLocalServiceDiscovery = false
     if (this.timer) {
       clearInterval(this.timer)
     }
+    //#ifdef MP-WEIXIN
+    wx.stopLocalServiceDiscovery({
+      success: () => {
+        console.log('退出页面 停止 dns 扫描成功。')
+      },
+      fail: () => {
+        console.log('退出页面 停止 dns 扫描失败。')
+      }
+    })
+    wx.offLocalServiceFound(res => {
+      console.log('offLocalServiceFound')
+    })
+    //#endif
   },
   methods: {
     getScanCode () {
@@ -148,6 +164,9 @@ export default {
               console.log('停止 dns 扫描成功： ', this.deviceList)
             }
           })
+          wx.offLocalServiceFound(res => {
+            console.log('offLocalServiceFound')
+          })
         }
       }, 1000)
       wx.startLocalServiceDiscovery({
@@ -172,9 +191,10 @@ export default {
             }
           })
         },
-        fail: () => {
+        fail: (e) => {
           this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
           console.log('startLocalServiceDiscovery失败: ')
+          console.log(e)
         }
       })
       //#endif

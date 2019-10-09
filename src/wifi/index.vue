@@ -82,7 +82,10 @@ export default {
       step_04_status: null,
       timer: null,
       LocalServiceDiscoveryTimer: null,
-      count: 0
+      count: 0,
+      waitTimer: null,
+      isWifiConnect: false,
+      wifiConnectCount: 0,
     }
   },
   onShow() {
@@ -110,6 +113,8 @@ export default {
     this.step_02_status = null
     this.step_03_status = null
     this.step_04_status = null
+    this.isWifiConnect = false
+    this.wifiConnectCount = 0
     //#ifdef MP-WEIXIN
     if (this.startWifi) {
       wx.stopWifi({
@@ -133,6 +138,9 @@ export default {
     }
     if (this.timer) {
       clearTimeout(this.timer)
+    }
+    if (this.waitTimer) {
+      clearTimeout(this.waitTimer)
     }
     if (this.LocalServiceDiscoveryTimer) {
       clearTimeout(this.LocalServiceDiscoveryTimer)
@@ -239,13 +247,20 @@ export default {
           console.log('连接CMD成功！');
           this.$CommonJs.showToast('连接CMD成功！')
 
+          console.log('连接CMD成功返回值： ', res)
           // 第一步成功
           this.step_01_status = true
 
           // udp配网
           // wifi配网
-          this.wifiConnect(this.wifiSSID, this.password)
-          console.log('连接CMD成功返回值： ', res)
+          this.waitTimer = setInterval(()=>{
+            this.wifiConnectCount ++
+            if (this.isWifiConnect || this.wifiConnectCount > 10) {
+              clearInterval(this.waitTimer)
+            } else {
+              this.wifiConnect(this.wifiSSID, this.password)
+            }
+          }, 2000)
         },
         fail: (err) => {
           console.log(err)
@@ -264,13 +279,15 @@ export default {
       console.log('接口返回值：', data)
       const [error, res] = data;
       if (error) {
-        uni.showToast({
-          title: '请求失败！',
-          icon: 'none',
-          duration: 2000
-        });
-        this.step_02_status = false
-        this.goBack()
+        if (this.wifiConnectCount > 10) {
+          uni.showToast({
+            title: '请求失败！',
+            icon: 'none',
+            duration: 2000
+          });
+          this.step_02_status = false
+          this.goBack()
+        }
         return false
       }
       let resultDdata = res.data;
@@ -279,17 +296,20 @@ export default {
         this.$CommonJs.showToast('请求CMD成功！')
 
         // 第二步成功！
+        this.isWifiConnect = true
         this.step_02_status = true
         this.connectWifi(false)
         console.log('请求CMD成功返回值：', resultDdata)
       } else {
-        uni.showToast({
-          title: '请求失败了！',
-          icon: 'none',
-          duration: 2000
-        });
-        this.step_02_status = false
-        this.goBack()
+        if (this.wifiConnectCount > 10) {
+          uni.showToast({
+            title: '请求失败了！',
+            icon: 'none',
+            duration: 2000
+          });
+          this.step_02_status = false
+          this.goBack()
+        }
       }
     },
     // mDns 
@@ -307,7 +327,7 @@ export default {
           console.log('startLocalServiceDiscovery success')
           this.LocalServiceDiscoveryTimer = setInterval(() => {
             this.count ++
-            if (this.count >= 10) {
+            if (this.count >= 30) {
               clearInterval(this.LocalServiceDiscoveryTimer)
               this.$CommonJs.showToast('配网超时！')
               this.step_03_status = false

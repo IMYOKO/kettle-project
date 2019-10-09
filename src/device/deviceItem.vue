@@ -106,7 +106,8 @@ export default {
       yy_modelname: "",
       yy_overtime: "",
       yy_status: "", // 预约工作状态:0待进行，1进行中（进行中要计算进行了多久，待进行要计算还要多长时间才开始工作
-      isPullDownRefresh: false
+      isPullDownRefresh: false,
+      timer: null
     }
   },
   onLoad(option) {
@@ -120,14 +121,17 @@ export default {
     if (this.deviceid) {
       console.log('=====> 模式列表页刷新')
       this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
+      this.timer = setInterval(() => {
+        this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
+      }, 10000)
     }
   },
   onPullDownRefresh() {
     this.isPullDownRefresh = true
-    this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
+    // this.queryDeviceInfo({userid: this.userid, deviceid: this.deviceid})
   },
   onHide() {
-    clearTimeout(this.timer)
+    clearInterval(this.timer)
   },
   computed: {
     ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop', 'showStopWorke'])
@@ -135,11 +139,11 @@ export default {
   methods: {
     ...mapMutations(['setCodeType', 'setOtaType', 'setDeviceInfoItems', 'setCancelPopType', 'setYuyueInfor', 'setStopWorkeType']),
     async queryDeviceInfo (prams) {
-      uni.showLoading({
-        title: '请求中...'
-      });
+      // uni.showLoading({
+      //   title: '请求中...'
+      // });
       const data = await this.$server.queryDeviceInfo(prams)
-      uni.hideLoading();
+      // uni.hideLoading();
       if (this.isPullDownRefresh) {
         uni.stopPullDownRefresh()
         this.isPullDownRefresh = false
@@ -177,7 +181,7 @@ export default {
 			)
     },
     goStop () {
-      this.$CommonJs.pathTo('/device/stop?status=' + this.device_status + '&deviceid=' + this.deviceid + '&wendu=' + this.wendu + '&over_time=' + this.over_time)
+      this.$CommonJs.pathTo('/device/stop?status=' + this.device_status + '&deviceid=' + this.deviceid + '&wendu=' + this.wendu + '&over_time=' + this.over_time + '&yy_modelname=' + this.yy_modelname)
     },
     goYuyueDevicepage (modelid) {
       let item
