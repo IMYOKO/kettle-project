@@ -133,6 +133,9 @@ export default {
   onHide() {
     clearInterval(this.timer)
   },
+  onUnload() {
+    clearInterval(this.timer)
+  },
   computed: {
     ...mapState(['showCodePop', 'showOtaPop', 'userid', 'deviceInfoItems', 'showCancelPop', 'showStopWorke'])
   },

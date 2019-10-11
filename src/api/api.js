@@ -161,6 +161,14 @@ class Api extends BasicApi {
     return this.post(`/api/overDeviceYy.htm`, data, {})
   }
 
+  /**
+   *  获取温度
+   * @param {Number} deviceid
+   */
+  queryWd (data) {
+    return this.post(`/api/queryWd.htm`, data, {})
+  }
+
 }
 
 export default new Api()
