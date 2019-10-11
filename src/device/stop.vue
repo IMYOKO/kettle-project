@@ -24,7 +24,6 @@
 import { mapState, mapMutations } from 'vuex'
 import StopWorke from '../component/stopWorke'
 
-
 export default {
   data () {
     return {
@@ -43,6 +42,11 @@ export default {
     this.over_time = option.over_time
     this.wendu = option.wendu
     this.yy_modelname = option.yy_modelname
+
+    // 循环温度
+    this.timer = setInterval(() => {
+      this.queryWd()
+    }, 10000)
   },
   onUnload () {
     if (this.timer) {
@@ -53,7 +57,16 @@ export default {
     ...mapState(['userid', 'showStopWorke'])
   },
   methods: {
-    ...mapMutations(['setStopWorkeType'])
+    ...mapMutations(['setStopWorkeType']),
+    async queryWd () {
+      const data = await this.$server.queryWd({deviceid: this.deviceid})
+      this.$server.resultCallback(
+				data,
+				(data) => {
+          this.wendu = data.wendu
+				}
+			)
+    }
   },
   components: {
     StopWorke
