@@ -99,58 +99,64 @@ export default {
     // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
   },
   onHide() {
-    this.wifiSSID = ''
-    this.BSSID = ''
-    this.password = ''
-    this.networkType = ''
-    this.showConnect = false
-    this.connected = false
-    this.connectedAgain = false
-    this.startWifi = false
-    this.startLSD = false
-    this.udpSocket = null
-    this.step_01_status = null
-    this.step_02_status = null
-    this.step_03_status = null
-    this.step_04_status = null
-    this.isWifiConnect = false
-    this.wifiConnectCount = 0
-    //#ifdef MP-WEIXIN
-    if (this.startWifi) {
-      wx.stopWifi({
-        success: (res) => {
-          console.log(res)
-        },
-        fail: (err) => {
-          console.log(err)
-        }
-      })
-    }
-    if (this.startLSD) {
-      wx.stopLocalServiceDiscovery({
-        success: (res) => {
-          console.log(res)
-        },
-        fail: (err) => {
-          console.log(err)
-        }
-      })
-    }
-    if (this.timer) {
-      clearTimeout(this.timer)
-    }
-    if (this.waitTimer) {
-      clearTimeout(this.waitTimer)
-    }
-    if (this.LocalServiceDiscoveryTimer) {
-      clearTimeout(this.LocalServiceDiscoveryTimer)
-    }
-    //#endif
+    this.clears()
+  },
+  onUnload() {
+    this.clears()
   },
   computed: {
     ...mapState(['wifi_qrcode', 'userid'])
   },
   methods: {
+    clears () {
+      this.wifiSSID = ''
+      this.BSSID = ''
+      this.password = ''
+      this.networkType = ''
+      this.showConnect = false
+      this.connected = false
+      this.connectedAgain = false
+      this.startWifi = false
+      this.startLSD = false
+      this.udpSocket = null
+      this.step_01_status = null
+      this.step_02_status = null
+      this.step_03_status = null
+      this.step_04_status = null
+      this.isWifiConnect = false
+      this.wifiConnectCount = 0
+      //#ifdef MP-WEIXIN
+      if (this.startWifi) {
+        wx.stopWifi({
+          success: (res) => {
+            console.log(res)
+          },
+          fail: (err) => {
+            console.log(err)
+          }
+        })
+      }
+      if (this.startLSD) {
+        wx.stopLocalServiceDiscovery({
+          success: (res) => {
+            console.log(res)
+          },
+          fail: (err) => {
+            console.log(err)
+          }
+        })
+      }
+      if (this.timer) {
+        clearTimeout(this.timer)
+      }
+      if (this.waitTimer) {
+        clearTimeout(this.waitTimer)
+      }
+      if (this.LocalServiceDiscoveryTimer) {
+        clearTimeout(this.LocalServiceDiscoveryTimer)
+      }
+      //#endif
+    },
     close () {
       this.showConnect = false
       this.password = ''
@@ -166,17 +172,16 @@ export default {
         wx.startWifi({
           success: (res) => {
             this.startWifi = true
-            console.log('初始化wifi成功！');
+            console.log('初始化wifi成功！', res);
             wx.getConnectedWifi({
               success: (WifiInfo) => {
-                console.log(WifiInfo)
-                console.log('检测已连接的wifi成功！');
+                console.log('检测已连接的wifi成功！', WifiInfo);
                 this.wifiSSID = WifiInfo.wifi.SSID
                 this.BSSID = WifiInfo.wifi.BSSID
                 this.showConnect = true
               },
-              fail: () => {
-                console.log('检测已连接的wifi失败！');
+              fail: (err) => {
+                console.log('step_01_status, 检测已连接的wifi失败！', err);
                 this.$CommonJs.showToast('检测连接Wi-Fi失败！')
                 this.step_01_status = false
                 this.goBack()
@@ -201,11 +206,10 @@ export default {
         BSSID: this.BSSID,
         password: this.password,
         success: (res) => {
-          console.log('连接wifi成功！');
           this.$CommonJs.showToast('连接wifi成功！')
           this.showConnect = false
           this.connected = true
-          console.log('连接wifi成功返回值： ', res)
+          console.log('连接wifi成功！连接wifi成功返回值： ', res)
 
           // 连接设备
           if (type) {
@@ -220,17 +224,19 @@ export default {
               // 如果希望用户在最新版本的客户端上体验您的小程序，可以这样子提示
               this.$CommonJs.showToast('当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。')
               this.step_03_status = false
+              console.log('step_03_status, 当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。');
               this.goBack()
             }
           }
         },
-        fail: () => {
-          console.log('连接wifi失败！');
+        fail: (err) => {
           this.$CommonJs.showToast('连接wifi失败！')
           if (type) {
+            console.log('step_01_status, 连接wifi失败！', err);
             this.step_01_status = false
           } else {
             this.step_03_status = false
+            console.log('step_03_status, 连接wifi失败！', err);
           }
           this.goBack()
         }
@@ -244,10 +250,9 @@ export default {
         SSID: this.$ConfigData.Ssid,
         password: this.$ConfigData.WpaPsk,
         success: (res) => {
-          console.log('连接CMD成功！');
           this.$CommonJs.showToast('连接CMD成功！')
 
-          console.log('连接CMD成功返回值： ', res)
+          console.log('连接CMD成功！连接CMD成功返回值： ', res)
           // 第一步成功
           this.step_01_status = true
 
@@ -263,8 +268,7 @@ export default {
           }, 2000)
         },
         fail: (err) => {
-          console.log(err)
-          console.log('连接CMD失败！');
+          console.log('step_01_status, 连接CMD失败！', err);
           this.$CommonJs.showToast('连接CMD失败！')
           this.step_01_status = false
           this.goBack()
@@ -286,6 +290,7 @@ export default {
             duration: 2000
           });
           this.step_02_status = false
+          console.log('step_02_status error, 请求失败', error)
           this.goBack()
         }
         return false
@@ -308,6 +313,7 @@ export default {
             duration: 2000
           });
           this.step_02_status = false
+          console.log('step_02_status resultDdata, 请求失败', resultDdata)
           this.goBack()
         }
       }
@@ -331,6 +337,7 @@ export default {
               clearInterval(this.LocalServiceDiscoveryTimer)
               this.$CommonJs.showToast('配网超时！')
               this.step_03_status = false
+              console.log('step_03_status 配网超时！')
               this.goBack()
               uni.hideLoading();
             }
@@ -350,17 +357,16 @@ export default {
               this.addDevice(res.serviceName)
             } else {
               this.$CommonJs.showToast('配网失败！')
-
+              console.log('step_03_status, 配网失败！', res)
               this.step_03_status = false
               this.goBack()
             }
           })
         },
-        fail: () => {
+        fail: (err) => {
           this.$CommonJs.showToast('startLocalServiceDiscovery失败！')
-          console.log('startLocalServiceDiscovery失败: ')
           uni.hideLoading();
-
+          console.log('step_03_status, startLocalServiceDiscovery失败！', err)
           this.step_03_status = false
           this.goBack()
         }
@@ -378,7 +384,8 @@ export default {
         // 第四步成功！
         this.step_04_status = true
       },
-      () => {
+      (data) => {
+        console.log('step_04_status 绑定失败！', data)
         this.step_04_status = false
         this.goBack()
       })
