@@ -39,10 +39,6 @@
     <!-- <view class="wifi-button">
       <view class="button" @click="wifiConnect($ConfigData.Ssid, $ConfigData.WpaPsk)">接口测试</view>
     </view> -->
-    <!-- <view class="wifi-button" v-if="connectedAgain"> -->
-    <!-- <view class="wifi-button">
-      <view class="button" @click="startLocalServiceDiscovery">测mDNS</view>
-    </view> -->
 
     <view class="wifi-pop" v-if="showConnect">
       <view class="close" @click="close">取消</view>
@@ -54,7 +50,7 @@
       </view>
 
       <view class="wifi-button sure">
-        <view class="button" @click="connectWifi(true)">确定</view>
+        <view class="button" @click="getSystemInfo()">确定</view>
       </view>
     </view>
 
@@ -86,6 +82,8 @@ export default {
       waitTimer: null,
       isWifiConnect: false,
       wifiConnectCount: 0,
+      system: null,
+      version: null,
     }
   },
   onShow() {
@@ -95,8 +93,6 @@ export default {
         console.log('网络类型： ', res.networkType);
       }
     });
-    // this.startLocalServiceDiscovery()
-    // this.wifiConnect(this.$ConfigData.Ssid, this.$ConfigData.WpaPsk)
   },
   onHide() {
     this.clears()
@@ -195,12 +191,41 @@ export default {
         this.goBack()
       }
     },
+    getSystemInfo () {
+      wx.getSystemInfo({
+        success: res => {
+          this.system = res.system.split(' ')[0]
+          this.version = Number.parseInt(res.system.split(' ')[1])
+          console.log('手机版本：', this.system, this.version)
+
+          if (this.system == 'iOS') {
+            if (this.version >= 11) {
+              this.connectWifi(true)
+            } else {
+              this.$CommonJs.showToast(`iOS ${this.version} 版本不兼容`)
+              console.log('ios 版本不兼容：', this.system, this.version)
+            }
+          } else if (this.system == 'Android') {
+            if (this.version >= 6) {
+              this.connectWifi(true)
+            } else {
+              this.$CommonJs.showToast(`Android ${this.version} 版本不兼容`)
+              console.log('Android 版本不兼容：', this.system, this.version)
+            }
+          } else {
+             this.connectWifi(true)
+            console.log('手机版本：', this.system, this.version)
+          }
+        },
+        fail: err => {
+          console.log(err)
+          this.step_01_status = false
+          this.goBack()
+        }
+      })
+    },
     connectWifi (type) {
       //#ifdef MP-WEIXIN
-      if (this.password == '') {
-        this.$CommonJs.showToast('请输入wifi密码！')
-        return
-      }
       wx.connectWifi({
         SSID: this.wifiSSID,
         BSSID: this.BSSID,
@@ -257,6 +282,18 @@ export default {
           this.step_01_status = true
 
           // udp配网
+          const message = {
+            ssid: this.$ConfigData.Ssid,
+            psk: this.$ConfigData.WpaPsk,
+          }
+          const udp = wx.createUDPSocket()
+          udp.bind()
+          udp.send({
+            address: '192.168.1.1',
+            port: 12345,
+            message: JSON.stringify(message)
+          })
+
           // wifi配网
           this.waitTimer = setInterval(()=>{
             this.wifiConnectCount ++
@@ -269,9 +306,50 @@ export default {
         },
         fail: (err) => {
           console.log('step_01_status, 连接CMD失败！', err);
-          this.$CommonJs.showToast('连接CMD失败！')
-          this.step_01_status = false
-          this.goBack()
+          if (err.errCode === 12003) {
+            console.log('尝试重新连接cmd')
+            wx.connectWifi({
+              SSID: this.$ConfigData.Ssid,
+              password: this.$ConfigData.WpaPsk,
+              success: (res) => {
+                this.$CommonJs.showToast('连接CMD成功！')
+
+                console.log('重新连接CMD成功！连接CMD成功返回值： ', res)
+                // 第一步成功
+                this.step_01_status = true
+
+                // udp配网
+                const message = {
+                  ssid: this.$ConfigData.Ssid,
+                  psk: this.$ConfigData.WpaPsk,
+                }
+                const udp = wx.createUDPSocket()
+                udp.bind()
+                udp.send({
+                  address: '192.168.1.1',
+                  port: 12345,
+                  message: JSON.stringify(message)
+                })
+
+                // wifi配网
+                this.waitTimer = setInterval(()=>{
+                  this.wifiConnectCount ++
+                  if (this.isWifiConnect || this.wifiConnectCount > 10) {
+                    clearInterval(this.waitTimer)
+                  } else {
+                    this.wifiConnect(this.wifiSSID, this.password)
+                  }
+                }, 2000)
+              },
+              fail: (err) => {
+                console.log('重新连接失败')
+              }
+            })
+          } else {
+            this.$CommonJs.showToast('连接CMD失败！')
+            this.step_01_status = false
+            this.goBack()
+          }
         }
       })
       //#endif
