@@ -226,6 +226,16 @@ export default {
     },
     connectWifi (type) {
       //#ifdef MP-WEIXIN
+      wx.onWifiConnected((WifiInfo) => {
+        console.log('wx.onWifiConnected: ', WifiInfo.wifi.SSID)
+        // this.$CommonJs.showToast('连接上：', WifiInfo.wifi.SSID)
+        // if (WifiInfo.wifi.SSID == '') {
+        //   setTimeout(() => {
+        //     this.wifiConnect(this.wifiSSID, this.password)
+        //     console.log('连接MTK_SOFT_AP成功')
+        //   }, 1000)
+        // }
+      })
       wx.connectWifi({
         SSID: this.wifiSSID,
         BSSID: this.BSSID,
@@ -306,50 +316,54 @@ export default {
         },
         fail: (err) => {
           console.log('step_01_status, 连接CMD失败！', err);
-          if (err.errCode === 12003) {
-            console.log('尝试重新连接cmd')
-            wx.connectWifi({
-              SSID: this.$ConfigData.Ssid,
-              password: this.$ConfigData.WpaPsk,
-              success: (res) => {
-                this.$CommonJs.showToast('连接CMD成功！')
+          // this.$CommonJs.showToast('连接CMD失败！')
+          this.$CommonJs.showToast('不支持此机型配网，请使用公众号配网！')
+          this.step_01_status = false
+          this.goBack()
+          // if (err.errCode === 12003) {
+          //   console.log('尝试重新连接cmd')
+          //   wx.connectWifi({
+          //     SSID: this.$ConfigData.Ssid,
+          //     password: this.$ConfigData.WpaPsk,
+          //     success: (res) => {
+          //       this.$CommonJs.showToast('连接CMD成功！')
 
-                console.log('重新连接CMD成功！连接CMD成功返回值： ', res)
-                // 第一步成功
-                this.step_01_status = true
+          //       console.log('重新连接CMD成功！连接CMD成功返回值： ', res)
+          //       // 第一步成功
+          //       this.step_01_status = true
 
-                // udp配网
-                const message = {
-                  ssid: this.$ConfigData.Ssid,
-                  psk: this.$ConfigData.WpaPsk,
-                }
-                const udp = wx.createUDPSocket()
-                udp.bind()
-                udp.send({
-                  address: '192.168.1.1',
-                  port: 12345,
-                  message: JSON.stringify(message)
-                })
+          //       // udp配网
+          //       const message = {
+          //         ssid: this.$ConfigData.Ssid,
+          //         psk: this.$ConfigData.WpaPsk,
+          //       }
+          //       const udp = wx.createUDPSocket()
+          //       udp.bind()
+          //       udp.send({
+          //         address: '192.168.1.1',
+          //         port: 12345,
+          //         message: JSON.stringify(message)
+          //       })
 
-                // wifi配网
-                this.waitTimer = setInterval(()=>{
-                  this.wifiConnectCount ++
-                  if (this.isWifiConnect || this.wifiConnectCount > 10) {
-                    clearInterval(this.waitTimer)
-                  } else {
-                    this.wifiConnect(this.wifiSSID, this.password)
-                  }
-                }, 2000)
-              },
-              fail: (err) => {
-                console.log('重新连接失败')
-              }
-            })
-          } else {
-            this.$CommonJs.showToast('连接CMD失败！')
-            this.step_01_status = false
-            this.goBack()
-          }
+          //       // wifi配网
+          //       this.waitTimer = setInterval(()=>{
+          //         this.wifiConnectCount ++
+          //         if (this.isWifiConnect || this.wifiConnectCount > 10) {
+          //           clearInterval(this.waitTimer)
+          //         } else {
+          //           this.wifiConnect(this.wifiSSID, this.password)
+          //         }
+          //       }, 2000)
+          //     },
+          //     fail: (err) => {
+          //       console.log('重新连接失败', err)
+          //     }
+          //   })
+          // } else {
+          //   this.$CommonJs.showToast('连接CMD失败！')
+          //   this.step_01_status = false
+          //   this.goBack()
+          // }
         }
       })
       //#endif
